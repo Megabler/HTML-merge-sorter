@@ -1,0 +1,590 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>Gacha Sorter</title>
+<style>
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: rgb(32,32,32);
+  }
+  
+img {
+  display: block;
+  margin: auto;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  width: 65%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+
+button {
+    margin: 0 auto;
+    display: block;
+	margin-top:5%;
+	font-size: 40px;
+	color: white;
+	border-radius: 5%;
+	background: rgb(48,48,48);
+	border: 1px solid black;
+}
+
+#Main {
+  display: block;
+  margin: auto;
+  width: 60%;
+  height: 60%;
+  font-family: Arial, sans-serif;
+  margin-top: 4%;
+}
+
+.left {
+  height:100%;
+  border:1px solid black;
+  float: left;
+  width: 40%;
+}
+.middle {
+  height:100%;
+  float: left;
+  width: 18%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}
+.right {
+  height:100%;
+  border:1px solid black;
+  float: left;
+  width: 40%;
+}
+.label{
+	text-align: center;
+	padding-bottom: 5%;
+}
+
+.selected{background-color: lightblue;}
+
+table {
+  margin: auto;
+  width: 30%;
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  text-align: center;
+}
+
+table, thead {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+th {
+  padding-top: 10px;
+  padding-bottom: 15px;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+td {
+  min-width:100px;
+  min-height:30px;
+  padding-top: 10px;
+  padding-bottom: 15px;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+#backButton {
+    position:fixed;
+    right:0;
+    top:0;
+	margin-right:50px;
+}
+
+#imageNumberSelector {
+	padding-top:5%;
+	padding-left:10px;
+    position:fixed;
+    left:0;
+    top:0;
+	margin: 0 auto;
+	display: block;
+}
+
+tr:nth-child(even) { background: rgb(48,48,48);}
+
+</style>
+</head>
+<body>
+<h1 style="text-align: center;padding-bottom: 3%"> Gacha Character Sorter </h1>
+
+<!-- The start frame where the user defines some options-->
+<div id="startFrame" style="text-align: center;">
+            
+	<button id="startButton" type="button" style="margin-top: 10%; margin-bottom: 5%;">Start!</button>
+	<form>
+		<input type="radio" id="genshin" name="game" value="Genshin" checked="checked">
+		<label for="genshin">Genshin</label> 
+		
+		<input type="radio" id="hsr" name="game" value="HSR">
+		<label for="hsr">HSR</label> 
+		
+		<input type="radio" id="zzz" name="game" value="ZZZ">
+		<label for="zzz">ZZZ</label>
+		
+		<input type="radio" id="wuwa" name="game" value="WuWa">
+		<label for="wuwa">WuWa</label>
+		
+		<input type="radio" id="all" name="game" value="all">
+		<label for="all">All</label>
+	</form>
+	<br>
+	<!-- element selection -->
+	<br>
+	<form>
+		<input type="checkbox" id="raritySelector" name="raritySelector" value="1" checked="checked">
+		<label for="raritySelector">Include 4* characters?</label> 
+		
+		<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
+		<label for="copiumSelector">Copium?</label> 
+	</form>
+
+</div>
+
+<!-- The Main frame where the user chooses between characters-->
+<div id="frame" style="display:none">
+
+	<div id="Main" >
+		<span id="left" class="left">
+			<img src=""> 
+			<div class="label">Left name</div>
+		</span>
+
+		<span id=middle class="middle">
+			<h2 id="Round" style="text-align:center">
+				<span id="counter">1</span> / <span id="numRounds">?</span>
+			</h2>
+			<button id="rarityButton" type="button" onclick="notSupported(event)" >Tie</button>
+			<button id="copiumButton" type="button" style="margin-top:40%" onclick="notSupported(event)" >Undo</button>
+		</span>
+
+		<span id=right class="right">
+			<img src="">
+			<div class="label">Right name</div>
+		</span>
+	</div>
+</div>
+
+
+<!-- The table frame that shows the result-->
+<div id="tableFrame" style="display:none">
+	<button id="backButton" type="button" style="margin-bottom: 5%;" onclick="notSupported(event)" >Return!</button>
+	
+	<form id="imageNumberSelector">
+	<label for="imgNumbers">Number of images:</label>
+		<select id="imgNumbers" name="imgNumbers" onchange="showResults()">
+			<option value="none">None</option>
+			<option value="3">3</option>
+			<option value="5">5</option>
+			<option value="10">10</option>
+			<option value="all">All</option>
+		</select>
+	</form>
+	
+	<table id="resultTable">
+	
+	</table>
+	
+</div>
+
+<script>
+	document.getElementById("startButton").addEventListener("click", start);
+	
+	function start(){
+		document.getElementById("startFrame").style.display = 'none';
+		
+		// Initialize arr with the data from the selected game
+        let gameSelector = document.getElementsByName('game');
+		for (i = 0; i < gameSelector.length; i++) {
+			if (gameSelector[i].checked){
+				console.log("Selected " + gameSelector[i].id);
+				switch(gameSelector[i].id) {
+				  case "all":
+					arr = initalizeArrayWithZZZ();
+					arr = arr.concat(initalizeArrayWithHSR());
+					arr = arr.concat(initalizeArrayWithWuWa());
+					arr = arr.concat(initalizeArrayWithGenshin());
+					console.log(arr);
+					break;
+				  case "zzz":
+					arr = initalizeArrayWithZZZ();
+					break;
+				  case "hsr":
+					arr = initalizeArrayWithHSR();
+					break;
+				  case "wuwa":
+					arr = initalizeArrayWithWuWa();
+					break;
+				  case "genshin":
+				  default:
+					arr = initalizeArrayWithGenshin();
+				}
+			}
+        }
+		arr = testInit();
+		initializeFirstOptions();
+		document.getElementById("Main").addEventListener("click", activateSelection);
+		setNumRounds();
+	}
+	
+	let arr = [];
+	
+	let next = 2;
+	let left = 0;
+	let leftIntern = 0;
+	let right = 1;
+	let rightIntern = 0;
+	let finishVar = false;
+	
+	let runningArray = [];
+	let curSubarray = [];
+	
+	
+	//------- Logic behind the sorting
+	function activateSelection(){
+		if(finishVar){
+			// If finished, we should no longer sort
+			alert("Done");
+			return;
+		}
+		const selected = event.target.closest('span');
+		console.log("Next: " + next);
+		console.log(arr);
+		
+		if(selected.classList.contains("left")){
+			selected.classList.add('selected');
+			setTimeout(() => selected.classList.remove('selected'), 200);
+			selectContentLeft(selected);
+		} else if(selected.classList.contains("right")) {
+			selected.classList.add('selected');
+			setTimeout(() => selected.classList.remove('selected'), 200);
+			selectContentRight(selected);
+		} else {
+			// TODO undo and tie buttons
+			const element = event.target;
+			element.classList.add('selected');
+			setTimeout(() => element.classList.remove('selected'), 200);
+			console.log("Neither left nor right was clicked");
+		}
+	}
+	
+	function selectContentLeft(selected){
+		// Add new preferred element to current subarray
+		curSubarray.push(arr[left][leftIntern]);
+		leftIntern++;
+			
+		let newContent;
+		if(arr[left].length === leftIntern){
+			completeRemainder();
+		} else {
+			newContent = arr[left][leftIntern];
+			update(selected, newContent);
+		}
+	}
+	
+	function selectContentRight(selected){
+		// Add new preferred element to current subarray
+		curSubarray.push(arr[right][rightIntern]);
+		rightIntern++;
+			
+		let newContent;
+		if(arr[right].length === rightIntern){
+			completeRemainder();
+		} else {
+			newContent = arr[right][rightIntern];
+			update(selected, newContent);
+		}
+	}
+	
+	function update(selected, newContent){
+		// Changes the content of the selected element
+		console.log("Load " + newContent);
+		selected.getElementsByTagName('div')[0].innerHTML = newContent.name;
+		selected.getElementsByTagName('img')[0].src = newContent.imageSrc;
+		selected.getElementsByTagName('img')[0].alt = newContent.name;
+	}
+	
+	function completeRemainder(){
+		// Adds all remaining elements from the right and then the left, and updates pointers and html content accordingly
+		// If called if either left or right is finished, the order in which remaining elements are added is irrelevant
+		finishRight();
+		finishLeft();
+		
+		runningArray.push(curSubarray);
+		console.log("Adding to new array: " + curSubarray.toString());
+		console.log("size of new array: " + runningArray.length);
+		curSubarray = [];
+		
+		console.log((next === arr.length ) + ", " + ( next + 1 === arr.length))
+		if(next === arr.length || next + 1 === arr.length){
+			// Examined everything once (except one subarray if there is an odd number) so reset pointers
+			console.log("Run finish");
+			finish();
+			if(finishVar) return;
+		}
+		
+		// update left
+		newContent = arr[next][0];
+		update(document.getElementById("left"), newContent); 
+		leftIntern = 0;
+		left = next;
+		next++;
+		
+		// update right
+		newContent = arr[next][0];
+		update(document.getElementById("right"), newContent); 
+		rightIntern = 0;
+		right = next;
+		next++;
+	}
+	
+	function finishRight(){
+	// Add the remaining elements from the right subarray to the subarray
+		while(rightIntern < arr[right].length){
+			curSubarray.push(arr[right][rightIntern]);
+			rightIntern++;
+		}
+	}
+	
+	function finishLeft(){
+	// Add the remaining elements from the left subarray to the current subarray
+		while(leftIntern < arr[left].length){
+			curSubarray.push(arr[left][leftIntern]);
+			leftIntern++;
+		}
+	}
+		
+	
+	function finish(){
+		// Reset pointers and arrays, and potentially stop further selection if finished
+		console.log("All elements inspected");
+		document.getElementById("counter").innerHTML = +document.getElementById("counter").innerHTML + 1;
+		if(arr.length % 2 === 1){
+			// Add the last element that was not inspected in the last round to the front
+			runningArray.unshift(arr[arr.length - 1]);
+		}
+		
+		arr = runningArray;
+		runningArray = [];
+		console.log("New array: " + arr.toString());
+		next = 0;
+		if(arr.length === 1){
+			// Everything was sorted
+			finishVar = true;
+			console.log("Everything sorted");
+			
+			// Flatten array 
+			arr = arr[0];
+			
+			document.getElementById("Main").style.display = 'none';
+			showResults();
+		}
+	}
+	
+	function showResults(){
+		console.log("Change table");
+		
+		document.getElementById("startFrame").style.display = 'none';
+		document.getElementById("frame").style.display = 'none';
+		document.getElementById("tableFrame").style.display = '';
+		
+		let numImages = document.getElementById("imgNumbers").value;
+		console.log(numImages);
+		if(numImages === "none"){
+			numImages = 0;
+		} else if(numImages === "all"){
+			numImages = arr.length;
+		} else {
+			numImages = +numImages;
+		}
+		console.log(numImages);
+		createTable(numImages);
+	}
+	
+	function createTable(numImages){
+		// https://stackoverflow.com/questions/14643617/create-table-using-javascript
+		const tbl = document.getElementById('resultTable');
+		tbl.innerHTML = "";
+		
+		let orderArrayHeader = ["Rank", "", "Name"];
+		let thead = document.createElement('thead');
+
+		tbl.appendChild(thead);
+		for (let i = 0; i < orderArrayHeader.length; i++) {
+			thead.appendChild(document.createElement("th")).
+				  appendChild(document.createTextNode(orderArrayHeader[i]));
+		}
+		
+		for (let i = 0; i < arr.length; i++) {
+			const tr = tbl.insertRow();
+			
+			let td = tr.insertCell();
+			td.appendChild(document.createTextNode(i + 1));
+			
+			td = tr.insertCell();
+			if(i < numImages){
+				const img = document.createElement('img');
+				img.src = arr[i].imageSrc;
+				td.appendChild(img);
+			}
+			
+			td = tr.insertCell();
+			td.appendChild(document.createTextNode(arr[i].name));
+		}
+	}
+	
+	function setNumRounds(){
+		// Calculate how many rounds are needed to compare everything and set it in the html
+		let numRounds = Math.ceil(Math.log2(arr.length));
+		console.log(2**numRounds, arr.length);
+		document.getElementById("numRounds").innerHTML = numRounds;
+	}
+	
+	function initializeFirstOptions(){
+		document.getElementById("left").getElementsByTagName('div')[0].innerHTML = arr[0][0].name;
+		document.getElementById("left").getElementsByTagName('img')[0].src = arr[0][0].imageSrc;
+		document.getElementById("left").getElementsByTagName('img')[0].alt = arr[0][0].name;
+		
+		document.getElementById("right").getElementsByTagName('div')[0].innerHTML = arr[1][0].name;
+		document.getElementById("right").getElementsByTagName('img')[0].src = arr[1][0].imageSrc;
+		document.getElementById("right").getElementsByTagName('img')[0].alt = arr[1][0].name;
+		document.getElementById("frame").style.display = '';
+	}
+	
+	//----- Initizialize arrays with fixed values
+	function initalizeArrayWithZZZ(){
+		let newArr = [];
+		const include4Stars = document.getElementById("raritySelector").checked;
+		
+		const inter = [
+			["01","four","Anby"], ["11","five","Nekomata"], ["12","four","Nicole"], ["05","five","Soldier 11"], ["52","five","Yidhari"], ["09","four","Corin"], ["25","five","Caesar"], ["10","four","Billy"], ["13","five","Miyabi"], ["14","five","Koleda"], ["15","four","Anton"], ["16","four","Ben"], ["17","four","Soukaku"], ["18","five","Lycaon"], ["27","four","Lucy"], ["26","five","Lighter"], ["32","five","Burnice"], ["20","five","Grace"], ["21","five","Ellen"], ["35","five","Harumasa"], ["22","five","Rina"], ["31","five","Yanagi"], ["23","five","Zhu Yuan"], ["29","five","Qingyi"], ["24","five","Jane"], ["30","four","Seth"], ["28","four","Piper"], ["42","five","Hugo"], ["49","five","Orphie & Magus"], ["36","five","Astra Yao"], ["37","five","Evelyn"], ["41","five","Vivian"], ["38","four","Pulchra"], ["39","five","Trigger"], ["44","five","Yixuan"], ["40","five","Soldier 0 - Anby"], ["43","five","Ju Fufu"], ["46","five","Alice"], ["47","five","Yuzuha"], ["45","four","Pan Yinhu"], ["51","four","Manato"], ["50","five","Lucia"], ["48","five","Seed"], ["53","five","Banyue"], ["54","five","Dialyn"], 
+		];
+		for(const entry of inter){
+			if(include4Stars || entry[1] === "five"){
+				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/zzz/UI/IconRoleCrop" + entry[0] + ".webp")]);
+			}
+		}
+		console.log("Loaded array: " + newArr + "; Length: " + newArr.length);
+		return newArr;
+	}
+	
+	function initalizeArrayWithGenshin(){
+		let newArr = [];
+		const include4Stars = document.getElementById("raritySelector").checked;
+		
+		const inter = [
+			["Jahoda", "four", "Jahoda", "Anemo"], ["Durin", "five", "Durin", "Pyro"], ["Nefer", "five", "Nefer", "Dendro"], ["Aino", "four", "Aino", "Hydro"], ["Flins", "five", "Flins", "Electro"], ["Lauma", "five", "Lauma", "Dendro"], ["Ineffa", "five", "Ineffa", "Electro"], ["Dahlia", "four", "Dahlia", "Hydro"], ["SkirkNew", "five", "Skirk", "Cryo"], ["Ifa", "four", "Ifa", "Anemo"], ["Escoffier", "five", "Escoffier", "Cryo"], ["Varesa", "five", "Varesa", "Electro"], ["Iansan", "four", "Iansan", "Electro"], ["Mizuki", "five", "Yumemizuki Mizuki", "Anemo"], ["Lanyan", "four", "Lan Yan", "Anemo"], ["Citlali", "five", "Citlali", "Cryo"], ["Mavuika", "five", "Mavuika", "Pyro"], ["Olorun", "four", "Ororon", "Electro"], ["Chasca", "five", "Chasca", "Anemo"], ["Xilonen", "five", "Xilonen", "Geo"], ["Mualani", "five", "Mualani", "Hydro"], ["Kinich", "five", "Kinich", "Dendro"], ["Kachina", "four", "Kachina", "Geo"], ["Emilie", "five", "Emilie", "Dendro"], ["Clorinde", "five", "Clorinde", "Electro"], ["Sethos", "four", "Sethos", "Electro"], ["Arlecchino", "five", "Arlecchino", "Pyro"], ["Sigewinne", "five", "Sigewinne", "Hydro"], ["Chiori", "five", "Chiori", "Geo"], ["Liuyun", "five", "Xianyun", "Anemo"], ["Gaming", "four", "Gaming", "Pyro"], ["Navia", "five", "Navia", "Geo"], ["Chevreuse", "four", "Chevreuse", "Pyro"], ["Furina", "five", "Furina", "Hydro"], ["Charlotte", "four", "Charlotte", "Cryo"], ["Neuvillette", "five", "Neuvillette", "Hydro"], ["Wriothesley", "five", "Wriothesley", "Cryo"], ["Freminet", "four", "Freminet", "Cryo"], ["Liney", "five", "Lyney", "Pyro"], ["Linette", "four", "Lynette", "Anemo"], ["Baizhuer", "five", "Baizhu", "Dendro"], ["Kaveh", "four", "Kaveh", "Dendro"], ["Mika", "four", "Mika", "Cryo"], ["Dehya", "five", "Dehya", "Pyro"], ["Alhatham", "five", "Alhaitham", "Dendro"], ["Yaoyao", "four", "Yaoyao", "Dendro"], ["Faruzan", "four", "Faruzan", "Anemo"], ["Wanderer", "five", "Wanderer", "Anemo"], ["Layla", "four", "Layla", "Cryo"], ["Nahida", "five", "Nahida", "Dendro"], ["Candace", "four", "Candace", "Hydro"], ["Cyno", "five", "Cyno", "Electro"], ["Nilou", "five", "Nilou", "Hydro"], ["Tighnari", "five", "Tighnari", "Dendro"], ["Dori", "four", "Dori", "Electro"], ["Collei", "four", "Collei", "Dendro"], ["Ayato", "five", "Kamisato Ayato", "Hydro"], ["Shinobu", "four", "Kuki Shinobu", "Electro"], ["Yunjin", "four", "Yun Jin", "Geo"], ["Shenhe", "five", "Shenhe", "Cryo"], ["Momoka", "four", "Kirara", "Dendro"], ["Yelan", "five", "Yelan", "Hydro"], ["Heizo", "four", "Shikanoin Heizou", "Anemo"], ["Yae", "five", "Yae Miko", "Electro"], ["Itto", "five", "Arataki Itto", "Geo"], ["Sara", "four", "Kujou Sara", "Electro"], ["Gorou", "four", "Gorou", "Geo"], ["Kokomi", "five", "Sangonomiya Kokomi", "Hydro"], ["Sayu", "four", "Sayu", "Anemo"], ["Shougun", "five", "Raiden Shogun", "Electro"], ["Eula", "five", "Eula", "Cryo"], ["Tohma", "four", "Thoma", "Pyro"], ["Yoimiya", "five", "Yoimiya", "Pyro"], ["Feiyan", "four", "Yanfei", "Pyro"], ["Kazuha", "five", "Kaedehara Kazuha", "Anemo"], ["Hutao", "five", "Hu Tao", "Pyro"], ["Rosaria", "four", "Rosaria", "Cryo"], ["Xinyan", "four", "Xinyan", "Pyro"], ["Sucrose", "four", "Sucrose", "Anemo"], ["Keqing", "five", "Keqing", "Electro"], ["Mona", "five", "Mona", "Hydro"], ["Diona", "four", "Diona", "Cryo"], ["Albedo", "five", "Albedo", "Geo"], ["Ganyu", "five", "Ganyu", "Cryo"], ["Chongyun", "four", "Chongyun", "Cryo"], ["Qiqi", "five", "Qiqi", "Cryo"], ["Noel", "four", "Noelle", "Geo"], ["Tartaglia", "five", "Tartaglia", "Hydro"], ["Bennett", "four", "Bennett", "Pyro"], ["Fischl", "four", "Fischl", "Electro"], ["Zhongli", "five", "Zhongli", "Geo"], ["Klee", "five", "Klee", "Pyro"], ["Ningguang", "four", "Ningguang", "Geo"], ["Xiao", "five", "Xiao", "Anemo"], ["Xingqiu", "four", "Xingqiu", "Hydro"], ["Beidou", "four", "Beidou", "Electro"], ["Xiangling", "four", "Xiangling", "Pyro"], ["Venti", "five", "Venti", "Anemo"], ["Ambor", "four", "Amber", "Pyro"], ["Razor", "four", "Razor", "Electro"], ["Diluc", "five", "Diluc", "Pyro"], ["Kaeya", "four", "Kaeya", "Cryo"], ["Barbara", "four", "Barbara", "Hydro"], ["Lisa", "four", "Lisa", "Electro"], ["Qin", "five", "Jean", "Anemo"], ["Ayaka", "five", "Kamisato Ayaka", "Cryo"]
+		];
+		for(const entry of inter){
+			if(include4Stars || entry[1] === "five"){
+				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/gi/UI/UI_AvatarIcon_" + entry[0] + ".webp")]);
+			}
+		}
+		console.log("Loaded array: " + newArr);
+		return newArr;
+	}
+	
+	function initalizeArrayWithHSR(){
+		let newArr = [];
+		const include4Stars = document.getElementById("raritySelector").checked;
+		
+		const inter = [
+			["1321", "five", "The Dahlia", "fire"], ["1415", "five", "Cyrene", "ice"], ["1412", "five", "Cerydra", "wind"], ["1413", "five", "Evernight", "ice"], ["1410", "five", "Hysilens", "physical"], ["1014", "five", "Saber", "wind"], ["1015", "five", "Archer", "quantum"], ["1408", "five", "Phainon", "physical"], ["1406", "five", "Cipher", "quantum"], ["1409", "five", "Hyacine", "wind"], ["1405", "five", "Anaxa", "wind"], ["1407", "five", "Castorice", "quantum"], ["1404", "five", "Mydei", "imaginary"], ["1403", "five", "Tribbie", "quantum"], ["1402", "five", "Aglaea", "thunder"], ["1401", "five", "The Herta", "ice"], ["1225", "five", "Fugue", "fire"], ["1313", "five", "Sunday", "imaginary"], ["1317", "five", "Rappa", "imaginary"], ["1222", "five", "Lingsha", "fire"], ["1220", "five", "Feixiao", "wind"], ["1223", "four", "Moze", "thunder"], ["1218", "five", "Jiaoqiu", "fire"], ["1221", "five", "Yunli", "physical"], ["1224", "four", "March 7th", "imaginary"], ["1314", "five", "Jade", "quantum"], ["1310", "five", "Firefly", "fire"], ["1315", "five", "Boothill", "physical"], ["1309", "five", "Robin", "physical"], ["1304", "five", "Aventurine", "imaginary"], ["1301", "four", "Gallagher", "fire"], ["1308", "five", "Acheron", "thunder"], ["1312", "four", "Misha", "ice"], ["1306", "five", "Sparkle", "quantum"], ["1307", "five", "Black Swan", "wind"], ["1305", "five", "Dr. Ratio", "imaginary"], ["1214", "four", "Xueyi", "quantum"], ["1303", "five", "Ruan Mei", "ice"], ["1215", "four", "Hanya", "physical"], ["1302", "five", "Argenti", "physical"], ["1217", "five", "Huohuo", "wind"], ["1112", "five", "Topaz &amp; Numby", "fire"], ["1210", "four", "Guinaifen", "fire"], ["1212", "five", "Jingliu", "ice"], ["1110", "four", "Lynx", "quantum"], ["1208", "five", "Fu Xuan", "quantum"], ["1213", "five", "Dan Heng • Imbibitor Lunae", "imaginary"], ["1005", "five", "Kafka", "thunder"], ["1111", "four", "Luka", "physical"], ["1205", "five", "Blade", "wind"], ["1203", "five", "Luocha", "imaginary"], ["1207", "four", "Yukong", "imaginary"], ["1006", "five", "Silver Wolf", "quantum"], ["1204", "five", "Jing Yuan", "thunder"], ["1001", "four", "March 7th", "ice"], ["1002", "four", "Dan Heng", "wind"], ["1003", "five", "Himeko", "fire"], ["1004", "five", "Welt", "imaginary"], ["1008", "four", "Arlan", "thunder"], ["1009", "four", "Asta", "fire"], ["1013", "four", "Herta", "ice"], ["1101", "five", "Bronya", "wind"], ["1102", "five", "Seele", "quantum"], ["1103", "four", "Serval", "thunder"], ["1104", "five", "Gepard", "ice"], ["1105", "four", "Natasha", "physical"], ["1106", "four", "Pela", "ice"], ["1107", "five", "Clara", "physical"], ["1108", "four", "Sampo", "wind"], ["1109", "four", "Hook", "fire"], ["1201", "four", "Qingque", "quantum"], ["1202", "four", "Tingyun", "thunder"], ["1206", "four", "Sushang", "physical"], ["1209", "five", "Yanqing", "ice"], ["1211", "five", "Bailu", "thunder"], ["1414", "five", "Dan Heng • Permansor Terrae", "physical"]
+		];
+		
+		for(const entry of inter){
+			if(include4Stars || entry[1] === "five"){ 
+				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/hsr/UI/avatarshopicon/" + entry[0] + ".webp")]);
+			}
+		}
+		
+		if(document.getElementById("copiumSelector").checked) {
+			newArr.push([new Entry("Smolrene", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+			newArr.push([new Entry("Cocolia", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+			newArr.push([new Entry("Tribios", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+		}
+		
+		console.log("Loaded array: " + newArr);
+		return newArr;
+	}
+	
+	function initalizeArrayWithWuWa(){
+		let newArr = [];
+		const include4Stars = document.getElementById("raritySelector").checked;
+		
+		const inter = [
+			["7", "four", "Sanhua", "Knife", "Ice"], ["6", "four", "Baizhi", "Magic", "Ice"], ["14", "five", "Lingyang", "Fist", "Ice"], ["27", "five", "Zhezhi", "Magic", "Ice"], ["31", "four", "Youhu", "Fist", "Ice"], ["32", "five", "Carlotta", "Gun", "Ice"], ["2", "four", "Chixia", "Gun", "Fire"], ["8", "five", "Encore", "Magic", "Fire"], ["13", "four", "Mortefi", "Gun", "Fire"], ["26", "five", "Changli", "Knife", "Fire"], ["44", "five", "Brant", "Knife", "Fire"], ["46", "five", "Lupa", "Sword", "Fire"], ["55", "five", "Galbrena", "Gun", "Fire"], ["18", "five", "Calcharo", "Sword", "Thunder"], ["17", "five", "Yinlin", "Magic", "Thunder"], ["15", "four", "Yuanwu", "Fist", "Thunder"], ["24", "five", "Jinhsi", "Sword", "Light"], ["25", "five", "Xiangli Yao", "Fist", "Thunder"], ["51", "five", "Augusta", "Sword", "Thunder"], ["58", "four", "Buling", "Magic", "Thunder"], ["1", "four", "Yangyang", "Knife", "Wind"], ["12", "four", "Aalto", "Gun", "Wind"], ["11", "five", "Jiyan", "Sword", "Wind"], ["23", "five", "Jianxin", "Fist", "Wind"], ["4", "five", "Rover: Aero", "Knife", "Wind"], ["37", "five", "Ciaccona", "Gun", "Wind"], ["5", "five", "Rover: Aero", "Knife", "Wind"], ["40", "five", "Cartethyia", "Knife", "Wind"], ["48", "five", "Iuno", "Fist", "Wind"], ["56", "five", "Qiuyuan", "Knife", "Wind"], ["4", "five", "Rover: Spectro", "Knife", "Light"], ["5", "five", "Rover: Spectro", "Knife", "Light"], ["3", "five", "Verina", "Magic", "Light"], ["30", "four", "Lumi", "Sword", "Thunder"], ["28", "five", "Shorekeeper", "Magic", "Light"], ["45", "five", "Phoebe", "Magic", "Light"], ["38", "five", "Zani", "Fist", "Light"], ["57", "five", "Chisa", "Sword", "Dark"], ["9", "four", "Taoqi", "Sword", "Dark"], ["10", "four", "Danjin", "Knife", "Dark"], ["29", "five", "Camellya", "Knife", "Dark"], ["5", "five", "Rover: Havoc", "Knife", "Dark"], ["4", "five", "Rover: Havoc", "Knife", "Dark"], ["33", "five", "Roccia", "Fist", "Dark"], ["34", "five", "Cantarella", "Magic", "Dark"], ["41", "five", "Phrolova", "Magic", "Dark"]
+		];
+		for(const entry of inter){
+			if(include4Stars || entry[1] === "five"){ 
+				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/ww/UI/UIResources/Common/Image/IconRoleHead256/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
+			}
+		}
+		console.log("Loaded array: " + newArr);
+		return newArr;
+	}
+	
+	class Entry {
+
+	constructor(name, rarity, imageSrc) {
+		this.name = name;
+		this.rarity = rarity;
+		this.imageSrc = imageSrc;
+		//console.log("Created entry for " + name);
+	}
+
+	}
+
+	Entry.prototype.toString = function() {
+		return "[" + this.name + ", " + this.rarity + "]";
+	}
+	
+	function notSupported(event){
+		event.preventDefault();
+		alert("Not implemented yet, sorry!");
+	}
+	
+	
+	
+	function testInit(){
+		let newArr = [];
+		const include4Stars = document.getElementById("raritySelector").checked;
+		
+		const inter = [
+			["1321", "five", "The Dahlia", "fire"], ["1415", "five", "Cyrene", "ice"], ["1412", "five", "Cerydra", "wind"]
+		];
+		
+		for(const entry of inter){
+			if(include4Stars || entry[1] === "five"){ 
+				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/hsr/UI/avatarshopicon/" + entry[0] + ".webp")]);
+			}
+		}
+		
+		if(document.getElementById("copiumSelector").checked) {
+			newArr.push([new Entry("Smolrene", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+			newArr.push([new Entry("Cocolia", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+		}
+		
+		console.log("Loaded array: " + newArr);
+		return newArr;
+	}
+	
+</script>
+
+</body>
+</html> 
