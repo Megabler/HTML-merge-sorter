@@ -49,6 +49,26 @@ button {
   margin-top: 4%;
 }
 
+
+#Selections {
+  display: block;
+  margin: auto;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  margin-top: 4%;
+}
+.leftSelection {
+  height:100%;
+  float: left;
+  width: 50%;
+}
+
+.rightSelection {
+  height:100%;
+  float: left;
+  width: 50%;
+}
+
 .left {
   height:100%;
   border:1px solid black;
@@ -131,26 +151,39 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 <!-- The start frame where the user defines some options-->
 <div id="startFrame" style="text-align: center;">
             
-	<button id="startButton" type="button" style="margin-top: 10%; margin-bottom: 5%;">Start!</button>
+	<button id="startButton" type="button" style="margin-top: 2%; margin-bottom: 5%;">Start!</button>
 	
-	<form onclick="changeElementsDisplayed(event)">
-		<input type="radio" id="genshin" name="game" value="genshin" checked="checked">
+	<form id="gameRadio" onclick="changeSelectorDisplayed(event)">
+		<input type="radio" id="genshinRadio" name="game" value="genshin" checked="checked">
 		<label for="genshin">Genshin</label> 
 		
-		<input type="radio" id="hsr" name="game" value="hsr">
+		<input type="radio" id="hsrRadio" name="game" value="hsr">
 		<label for="hsr">HSR</label> 
 		
-		<input type="radio" id="zzz" name="game" value="zzz">
+		<input type="radio" id="zzzRadio" name="game" value="zzz">
 		<label for="zzz">ZZZ</label>
 		
-		<input type="radio" id="wuwa" name="game" value="wuwa">
+		<input type="radio" id="wuwaRadio" name="game" value="wuwa">
 		<label for="wuwa">WuWa</label>
 		
-		<input type="radio" id="all" name="game" value="all">
+		<input type="radio" id="allRadio" name="game" value="all">
 		<label for="all">All</label>
 	</form>
+	
+	
+	<br>
+	<form>
+		<input type="checkbox" id="raritySelector" name="raritySelector" value="1" checked="checked">
+		<label for="raritySelector">Include 4* characters?</label> 
+		
+		<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
+		<label for="copiumSelector">Copium?</label> 
+	</form>
+	
+	<div id="Selections">
 	<!-- element selection -->
-	<form id="genshinElements" onclick="changeElements(event)">
+	<span id="elementSelection" class="leftSelection">
+	<form id="genshinElements" onclick="changeSelector(event)"  style="display:none">
 	<br>
 		<input type="checkbox" id="genshinAll" name="genshinElements" value="genshinAll" checked="checked">
 		<label for="genshinAll">All Elements</label> 
@@ -178,7 +211,7 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 	</form>
 	
 	
-	<form id="hsrElements" onclick="changeElements(event)" style="display:none">
+	<form id="hsrElements" onclick="changeSelector(event)" style="display:none">
 	<br>
 		<input type="checkbox" id="hsrAll" name="hsrElements" value="hsrAll" checked="checked">
 		<label for="hsrAll">All Elements</label> 
@@ -205,7 +238,7 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		<label for="hsrWind"><img src="https://api.hakush.in/hsr/UI/element/wind.webp" alt="Wind" class="selectionImage"> </label>
 	</form>
 	
-	<form id="zzzElements" onclick="changeElements(event)" style="display:none">
+	<form id="zzzElements" onclick="changeSelector(event)" style="display:none">
 	<br>
 		<input type="checkbox" id="zzzAll" name="zzzElements" value="zzzAll" checked="checked">
 		<label for="zzzAll">All Elements</label> 
@@ -226,7 +259,7 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		<label for="zzzEther"><img src="https://api.hakush.in/zzz/UI/IconEther.webp" alt="Ether" class="selectionImage"> </label>
 	</form>
 	
-	<form id="wuwaElements" onclick="changeElements(event)" style="display:none">
+	<form id="wuwaElements" onclick="changeSelector(event)" style="display:none">
 	<br>
 		<input type="checkbox" id="wuwaAll" name="wuwaElements" value="wuwaAll" checked="checked">
 		<label for="wuwaAll">All Elements</label> 
@@ -249,16 +282,13 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		<input type="checkbox" id="wuwaDark" name="wuwaElements" value="dark" checked="checked">
 		<label for="wuwaDark"><img src="https://api.hakush.in/ww/UI/Static/T_IconElementDark.webp" alt="Havoc" class="selectionImage"> </label>
 	</form>
-	
+	</span>
 	<!-- end element selection -->
-	<br>
-	<form>
-		<input type="checkbox" id="raritySelector" name="raritySelector" value="1" checked="checked">
-		<label for="raritySelector">Include 4* characters?</label> 
-		
-		<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
-		<label for="copiumSelector">Copium?</label> 
-	</form>
+	
+	<span id="weaponSelection" class="rightSelection">
+	</span>
+	</div>
+	
 
 </div>
 
@@ -311,6 +341,45 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 <script>
 	document.getElementById("startButton").addEventListener("click", start);
 	
+	
+	window.onload = function(){
+        let elementSelector = document.getElementsByName('game');
+		for (i = 0; i < elementSelector.length; i++) {
+			if (elementSelector[i].checked){
+				switch(elementSelector[i].id) {
+				  case "allRadio":
+						document.getElementById("genshinElements").style.display = '';
+						document.getElementById("genshinWeapons").style.display = '';
+						document.getElementById("hsrElements").style.display = '';
+						document.getElementById("hsrWeapons").style.display = '';
+						document.getElementById("zzzElements").style.display = '';
+						document.getElementById("zzzWeapons").style.display = '';
+						document.getElementById("wuwaElements").style.display = '';
+						document.getElementById("wuwaWeapons").style.display = '';
+					break;
+				  case "zzzRadio":
+						document.getElementById("zzzElements").style.display = '';
+						document.getElementById("zzzWeapons").style.display = '';
+					break;
+				  case "hsrRadio":
+						document.getElementById("hsrElements").style.display = '';
+						document.getElementById("hsrWeapons").style.display = '';
+					break;
+				  case "wuwaRadio":
+						document.getElementById("wuwaElements").style.display = '';
+						document.getElementById("wuwaWeapons").style.display = '';
+					break;
+				  case "genshinRadio":
+				  default:
+						document.getElementById("genshinElements").style.display = '';
+						document.getElementById("genshinWeapons").style.display = '';
+				}
+			}
+        }
+	}
+	
+	// TODO onhover copium selector: explain no element filtering, since element not known
+	
 	function start(){
 		document.getElementById("startFrame").style.display = 'none';
 		
@@ -320,23 +389,23 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			if (gameSelector[i].checked){
 				console.log("Selected " + gameSelector[i].id);
 				switch(gameSelector[i].id) {
-				  case "all":
+				  case "allRadio":
 					arr = initalizeArrayWithZZZ();
 					arr = arr.concat(initalizeArrayWithHSR());
 					arr = arr.concat(initalizeArrayWithWuWa());
 					arr = arr.concat(initalizeArrayWithGenshin());
 					console.log(arr);
 					break;
-				  case "zzz":
+				  case "zzzRadio":
 					arr = initalizeArrayWithZZZ();
 					break;
-				  case "hsr":
+				  case "hsrRadio":
 					arr = initalizeArrayWithHSR();
 					break;
-				  case "wuwa":
+				  case "wuwaRadio":
 					arr = initalizeArrayWithWuWa();
 					break;
-				  case "genshin":
+				  case "genshinRadio":
 				  default:
 					arr = initalizeArrayWithGenshin();
 				}
@@ -588,11 +657,20 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			["Jahoda", "four", "Jahoda", "Anemo"], ["Durin", "five", "Durin", "Pyro"], ["Nefer", "five", "Nefer", "Dendro"], ["Aino", "four", "Aino", "Hydro"], ["Flins", "five", "Flins", "Electro"], ["Lauma", "five", "Lauma", "Dendro"], ["Ineffa", "five", "Ineffa", "Electro"], ["Dahlia", "four", "Dahlia", "Hydro"], ["SkirkNew", "five", "Skirk", "Cryo"], ["Ifa", "four", "Ifa", "Anemo"], ["Escoffier", "five", "Escoffier", "Cryo"], ["Varesa", "five", "Varesa", "Electro"], ["Iansan", "four", "Iansan", "Electro"], ["Mizuki", "five", "Yumemizuki Mizuki", "Anemo"], ["Lanyan", "four", "Lan Yan", "Anemo"], ["Citlali", "five", "Citlali", "Cryo"], ["Mavuika", "five", "Mavuika", "Pyro"], ["Olorun", "four", "Ororon", "Electro"], ["Chasca", "five", "Chasca", "Anemo"], ["Xilonen", "five", "Xilonen", "Geo"], ["Mualani", "five", "Mualani", "Hydro"], ["Kinich", "five", "Kinich", "Dendro"], ["Kachina", "four", "Kachina", "Geo"], ["Emilie", "five", "Emilie", "Dendro"], ["Clorinde", "five", "Clorinde", "Electro"], ["Sethos", "four", "Sethos", "Electro"], ["Arlecchino", "five", "Arlecchino", "Pyro"], ["Sigewinne", "five", "Sigewinne", "Hydro"], ["Chiori", "five", "Chiori", "Geo"], ["Liuyun", "five", "Xianyun", "Anemo"], ["Gaming", "four", "Gaming", "Pyro"], ["Navia", "five", "Navia", "Geo"], ["Chevreuse", "four", "Chevreuse", "Pyro"], ["Furina", "five", "Furina", "Hydro"], ["Charlotte", "four", "Charlotte", "Cryo"], ["Neuvillette", "five", "Neuvillette", "Hydro"], ["Wriothesley", "five", "Wriothesley", "Cryo"], ["Freminet", "four", "Freminet", "Cryo"], ["Liney", "five", "Lyney", "Pyro"], ["Linette", "four", "Lynette", "Anemo"], ["Baizhuer", "five", "Baizhu", "Dendro"], ["Kaveh", "four", "Kaveh", "Dendro"], ["Mika", "four", "Mika", "Cryo"], ["Dehya", "five", "Dehya", "Pyro"], ["Alhatham", "five", "Alhaitham", "Dendro"], ["Yaoyao", "four", "Yaoyao", "Dendro"], ["Faruzan", "four", "Faruzan", "Anemo"], ["Wanderer", "five", "Wanderer", "Anemo"], ["Layla", "four", "Layla", "Cryo"], ["Nahida", "five", "Nahida", "Dendro"], ["Candace", "four", "Candace", "Hydro"], ["Cyno", "five", "Cyno", "Electro"], ["Nilou", "five", "Nilou", "Hydro"], ["Tighnari", "five", "Tighnari", "Dendro"], ["Dori", "four", "Dori", "Electro"], ["Collei", "four", "Collei", "Dendro"], ["Ayato", "five", "Kamisato Ayato", "Hydro"], ["Shinobu", "four", "Kuki Shinobu", "Electro"], ["Yunjin", "four", "Yun Jin", "Geo"], ["Shenhe", "five", "Shenhe", "Cryo"], ["Momoka", "four", "Kirara", "Dendro"], ["Yelan", "five", "Yelan", "Hydro"], ["Heizo", "four", "Shikanoin Heizou", "Anemo"], ["Yae", "five", "Yae Miko", "Electro"], ["Itto", "five", "Arataki Itto", "Geo"], ["Sara", "four", "Kujou Sara", "Electro"], ["Gorou", "four", "Gorou", "Geo"], ["Kokomi", "five", "Sangonomiya Kokomi", "Hydro"], ["Sayu", "four", "Sayu", "Anemo"], ["Shougun", "five", "Raiden Shogun", "Electro"], ["Eula", "five", "Eula", "Cryo"], ["Tohma", "four", "Thoma", "Pyro"], ["Yoimiya", "five", "Yoimiya", "Pyro"], ["Feiyan", "four", "Yanfei", "Pyro"], ["Kazuha", "five", "Kaedehara Kazuha", "Anemo"], ["Hutao", "five", "Hu Tao", "Pyro"], ["Rosaria", "four", "Rosaria", "Cryo"], ["Xinyan", "four", "Xinyan", "Pyro"], ["Sucrose", "four", "Sucrose", "Anemo"], ["Keqing", "five", "Keqing", "Electro"], ["Mona", "five", "Mona", "Hydro"], ["Diona", "four", "Diona", "Cryo"], ["Albedo", "five", "Albedo", "Geo"], ["Ganyu", "five", "Ganyu", "Cryo"], ["Chongyun", "four", "Chongyun", "Cryo"], ["Qiqi", "five", "Qiqi", "Cryo"], ["Noel", "four", "Noelle", "Geo"], ["Tartaglia", "five", "Tartaglia", "Hydro"], ["Bennett", "four", "Bennett", "Pyro"], ["Fischl", "four", "Fischl", "Electro"], ["Zhongli", "five", "Zhongli", "Geo"], ["Klee", "five", "Klee", "Pyro"], ["Ningguang", "four", "Ningguang", "Geo"], ["Xiao", "five", "Xiao", "Anemo"], ["Xingqiu", "four", "Xingqiu", "Hydro"], ["Beidou", "four", "Beidou", "Electro"], ["Xiangling", "four", "Xiangling", "Pyro"], ["Venti", "five", "Venti", "Anemo"], ["Ambor", "four", "Amber", "Pyro"], ["Razor", "four", "Razor", "Electro"], ["Diluc", "five", "Diluc", "Pyro"], ["Kaeya", "four", "Kaeya", "Cryo"], ["Barbara", "four", "Barbara", "Hydro"], ["Lisa", "four", "Lisa", "Electro"], ["Qin", "five", "Jean", "Anemo"], ["Ayaka", "five", "Kamisato Ayaka", "Cryo"]
 		];
 		for(const entry of inter){
+		// TODO weapon filtering and adding weapons OR warning that filtering doesn't work here
 			let elementId = "genshin" + capitalizeFirstLetter(entry[3]);
 			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/gi/UI/UI_AvatarIcon_" + entry[0] + ".webp")]);
 			}
 		}
+		
+		// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
+		if(document.getElementById("copiumSelector").checked) {
+			newArr.push([new Entry("Capitano", "five", "")]);
+			newArr.push([new Entry("Kitsune Saiguu", "five", "")]);
+			newArr.push([new Entry("Signora", "five", "")]);
+		}
+		
 		console.log("Loaded array: " + newArr);
 		return newArr;
 	}
@@ -606,16 +684,18 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		];
 		
 		for(const entry of inter){
+		// TODO path filtering
 			let elementId = "hsr" + capitalizeFirstLetter(entry[3]);
 			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/hsr/UI/avatarshopicon/" + entry[0] + ".webp")]);
 			}
 		}
 		
+		// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
 		if(document.getElementById("copiumSelector").checked) {
 			newArr.push([new Entry("Smolrene", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
-			newArr.push([new Entry("Cocolia", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
-			newArr.push([new Entry("Tribios", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+			newArr.push([new Entry("Cocolia", "five", "")]);
+			newArr.push([new Entry("Tribios", "five", "")]);
 		}
 		
 		console.log("Loaded array: " + newArr);
@@ -627,15 +707,24 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		const include4Stars = document.getElementById("raritySelector").checked;
 		
 		const inter = [
-			["01","four","Anby"], ["11","five","Nekomata"], ["12","four","Nicole"], ["05","five","Soldier 11"], ["52","five","Yidhari"], ["09","four","Corin"], ["25","five","Caesar"], ["10","four","Billy"], ["13","five","Miyabi"], ["14","five","Koleda"], ["15","four","Anton"], ["16","four","Ben"], ["17","four","Soukaku"], ["18","five","Lycaon"], ["27","four","Lucy"], ["26","five","Lighter"], ["32","five","Burnice"], ["20","five","Grace"], ["21","five","Ellen"], ["35","five","Harumasa"], ["22","five","Rina"], ["31","five","Yanagi"], ["23","five","Zhu Yuan"], ["29","five","Qingyi"], ["24","five","Jane"], ["30","four","Seth"], ["28","four","Piper"], ["42","five","Hugo"], ["49","five","Orphie & Magus"], ["36","five","Astra Yao"], ["37","five","Evelyn"], ["41","five","Vivian"], ["38","four","Pulchra"], ["39","five","Trigger"], ["44","five","Yixuan"], ["40","five","Soldier 0 - Anby"], ["43","five","Ju Fufu"], ["46","five","Alice"], ["47","five","Yuzuha"], ["45","four","Pan Yinhu"], ["51","four","Manato"], ["50","five","Lucia"], ["48","five","Seed"], ["53","five","Banyue"], ["54","five","Dialyn"], 
+			["01", "four", "Anby", "Stun" ,"Electric"], ["11", "five", "Nekomata", "AttackType" ,"Physical"], ["12", "four", "Nicole", "Support" ,"Ether"], ["05", "five", "Soldier 11", "AttackType" ,"Fire"], ["52", "five", "Yidhari", "Rupture" ,"Ice"], ["09", "four", "Corin", "AttackType" ,"Physical"], ["25", "five", "Caesar", "Defense" ,"Physical"], ["10", "four", "Billy", "AttackType" ,"Physical"], ["13", "five", "Miyabi", "Anomaly" ,"Frost"], ["14", "five", "Koleda", "Stun" ,"Fire"], ["15", "four", "Anton", "AttackType" ,"Electric"], ["16", "four", "Ben", "Defense" ,"Fire"], ["17", "four", "Soukaku", "Support" ,"Ice"], ["18", "five", "Lycaon", "Stun" ,"Ice"], ["27", "four", "Lucy", "Support" ,"Fire"], ["26", "five", "Lighter", "Stun" ,"Fire"], ["32", "five", "Burnice", "Anomaly" ,"Fire"], ["20", "five", "Grace", "Anomaly" ,"Electric"], ["21", "five", "Ellen", "AttackType" ,"Ice"], ["35", "five", "Harumasa", "AttackType" ,"Electric"], ["22", "five", "Rina", "Support" ,"Electric"], ["31", "five", "Yanagi", "Anomaly" ,"Electric"], ["23", "five", "Zhu Yuan", "AttackType" ,"Ether"], ["29", "five", "Qingyi", "Stun" ,"Electric"], ["24", "five", "Jane", "Anomaly" ,"Physical"], ["30", "four", "Seth", "Defense" ,"Electric"], ["28", "four", "Piper", "Anomaly" ,"Physical"], ["42", "five", "Hugo", "AttackType" ,"Ice"], ["49", "five", "Orphie &amp; Magus", "AttackType" ,"Fire"], ["36", "five", "Astra Yao", "Support" ,"Ether"], ["37", "five", "Evelyn", "AttackType" ,"Fire"], ["41", "five", "Vivian", "Anomaly" ,"Ether"], ["38", "four", "Pulchra", "Stun" ,"Physical"], ["39", "five", "Trigger", "Stun" ,"Electric"], ["44", "five", "Yixuan", "Rupture" ,"AuricInk"], ["40", "five", "Soldier 0 - Anby", "AttackType" ,"Electric"], ["43", "five", "Ju Fufu", "Stun" ,"Fire"], ["46", "five", "Alice", "Anomaly" ,"Physical"], ["47", "five", "Yuzuha", "Support" ,"Physical"], ["45", "four", "Pan Yinhu", "Defense" ,"Physical"], ["51", "four", "Manato", "Rupture" ,"Fire"], ["50", "five", "Lucia", "Support" ,"Ether"], ["48", "five", "Seed", "AttackType" ,"Electric"], ["53", "five", "Avatar_Male_Size03_BanYue", "Rupture" ,"Fire"], ["54", "five", "Azural", "Stun" ,"Physical"], 
 		];
 		for(const entry of inter){
-			// let elementId = "zzz" + capitalizeFirstLetter(entry[3]); TODO include element in array
-			//if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked){ 
-			if(include4Stars || entry[1] === "five") { 
+			entry[4] = specialTerm(entry[4]);
+			const elementId = "zzz" + capitalizeFirstLetter(entry[4]);
+			const weaponId = "zzz" + capitalizeFirstLetter(entry[3]);
+			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/zzz/UI/IconRoleCrop" + entry[0] + ".webp")]);
 			}
 		}
+		
+		// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
+		if(document.getElementById("copiumSelector").checked) {
+			newArr.push([new Entry("Isolde", "five", "")]);
+			newArr.push([new Entry("Sarah", "five", "")]);
+			newArr.push([new Entry("Pompey", "five", "")]);
+		}
+		
 		console.log("Loaded array: " + newArr + "; Length: " + newArr.length);
 		return newArr;
 	}
@@ -648,11 +737,19 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			["7", "four", "Sanhua", "Knife", "Ice"], ["6", "four", "Baizhi", "Magic", "Ice"], ["14", "five", "Lingyang", "Fist", "Ice"], ["27", "five", "Zhezhi", "Magic", "Ice"], ["31", "four", "Youhu", "Fist", "Ice"], ["32", "five", "Carlotta", "Gun", "Ice"], ["2", "four", "Chixia", "Gun", "Fire"], ["8", "five", "Encore", "Magic", "Fire"], ["13", "four", "Mortefi", "Gun", "Fire"], ["26", "five", "Changli", "Knife", "Fire"], ["44", "five", "Brant", "Knife", "Fire"], ["46", "five", "Lupa", "Sword", "Fire"], ["55", "five", "Galbrena", "Gun", "Fire"], ["18", "five", "Calcharo", "Sword", "Thunder"], ["17", "five", "Yinlin", "Magic", "Thunder"], ["15", "four", "Yuanwu", "Fist", "Thunder"], ["24", "five", "Jinhsi", "Sword", "Light"], ["25", "five", "Xiangli Yao", "Fist", "Thunder"], ["51", "five", "Augusta", "Sword", "Thunder"], ["58", "four", "Buling", "Magic", "Thunder"], ["1", "four", "Yangyang", "Knife", "Wind"], ["12", "four", "Aalto", "Gun", "Wind"], ["11", "five", "Jiyan", "Sword", "Wind"], ["23", "five", "Jianxin", "Fist", "Wind"], ["4", "five", "Rover: Aero", "Knife", "Wind"], ["37", "five", "Ciaccona", "Gun", "Wind"], ["5", "five", "Rover: Aero", "Knife", "Wind"], ["40", "five", "Cartethyia", "Knife", "Wind"], ["48", "five", "Iuno", "Fist", "Wind"], ["56", "five", "Qiuyuan", "Knife", "Wind"], ["4", "five", "Rover: Spectro", "Knife", "Light"], ["5", "five", "Rover: Spectro", "Knife", "Light"], ["3", "five", "Verina", "Magic", "Light"], ["30", "four", "Lumi", "Sword", "Thunder"], ["28", "five", "Shorekeeper", "Magic", "Light"], ["45", "five", "Phoebe", "Magic", "Light"], ["38", "five", "Zani", "Fist", "Light"], ["57", "five", "Chisa", "Sword", "Dark"], ["9", "four", "Taoqi", "Sword", "Dark"], ["10", "four", "Danjin", "Knife", "Dark"], ["29", "five", "Camellya", "Knife", "Dark"], ["5", "five", "Rover: Havoc", "Knife", "Dark"], ["4", "five", "Rover: Havoc", "Knife", "Dark"], ["33", "five", "Roccia", "Fist", "Dark"], ["34", "five", "Cantarella", "Magic", "Dark"], ["41", "five", "Phrolova", "Magic", "Dark"]
 		];
 		for(const entry of inter){
-			let elementId = "wuwa" + capitalizeFirstLetter(entry[4]);
-			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked){ 
+			const elementId = "wuwa" + capitalizeFirstLetter(entry[4]);
+			const weaponId = "wuwa" + capitalizeFirstLetter(entry[3]);
+			console.log(weaponId);
+			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/ww/UI/UIResources/Common/Image/IconRoleHead256/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
 			}
 		}
+		
+		// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
+		if(document.getElementById("copiumSelector").checked) {
+			//newArr.push([new Entry("Smolrene", "five", "")]);
+		}
+		
 		console.log("Loaded array: " + newArr);
 		return newArr;
 	}
@@ -702,7 +799,7 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		return newArr;
 	}
 	
-	function changeElements(event){
+	function changeSelector(event){
 		// Mark all boxes or unmark the "all elements" box
 		if(event.target.tagName.toLowerCase() === 'input'){
 			if(event.target.value.includes("All") && event.target.checked){
@@ -719,24 +816,30 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		}
 	}
 	
-	function changeElementsDisplayed(event){
+	function changeSelectorDisplayed(event){
+		// Change which element and weapon icons are displayed depending on the selected games
 		if(event.target.tagName.toLowerCase() === 'input'){
+			const selectors = document.getElementById("Selections").children;
 			if(event.target.value === "all"){
-				// Show all element options 
-				document.getElementById("genshinElements").style.display = '';
-				document.getElementById("hsrElements").style.display = '';
-				document.getElementById("zzzElements").style.display = '';
-				document.getElementById("wuwaElements").style.display = '';
+				// Iterate over left and right selector frames
+				for(const forms of selectors){
+					for(const form of forms.children){
+						form.style.display = '';
+					}
+				}
 				return;
 			}
 			// First hide all, and then show the one that was clicked on 
-			document.getElementById("genshinElements").style.display = 'none';
-			document.getElementById("hsrElements").style.display = 'none';
-			document.getElementById("zzzElements").style.display = 'none';
-			document.getElementById("wuwaElements").style.display = 'none';
+			for(const forms of selectors){
+				for(const form of forms.children){
+					form.style.display = 'none';
+				}
+			}
 			
 			console.log(event.target.value + "Elements");
 			document.getElementById(event.target.value + "Elements").style.display = '';
+			console.log(event.target.value + "Weapons");
+			document.getElementById(event.target.value + "Weapons").style.display = '';
 		}
 	}
 	
@@ -744,6 +847,126 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 	}
 	
+	function specialTerm(val){
+		switch(val){
+			case "Frost":
+				return "Ice";
+			case "AuricInk":
+				return "Ether";
+			default:
+				return val;
+		}
+	}
+	
+	// TODO createElementSelections()
+	
+	function createWeaponSelections(){
+		const frame = document.getElementById("weaponSelection");
+		const games = ["genshin", "hsr", "zzz", "wuwa"];
+		const gameOptions = {
+			genshin:["SWORD_ONE_HAND", "CATALYST", "CLAYMORE", "BOW", "POLE"],
+			hsr:["knight", "mage", "priest", "rogue", "shaman", "warlock", "warrior", "memory"],
+			zzz:["AttackType", "Stun", "Anomaly", "Support", "Defense", "Rupture"],
+			wuwa:["Knife", "Sword", "Gun", "Fist", "Magic"],
+		}
+		for(const game of games){
+			const form = document.createElement("form");
+			frame.appendChild(form);
+			form.setAttribute("id", game + "Weapons");
+			form.addEventListener("click", (e) => changeSelector(e));
+			form.setAttribute("style", "display:none");
+			form.appendChild(document.createElement("br"));
+			
+			createInput(game, "All", form);
+			const options = gameOptions[game];
+			for(const option of options){
+				createInput(game, option, form);
+			}
+		}
+	}
+	
+	function createInput(game, option, form){
+		// Creates a checkbox input and corresponding label and appends it to form
+		const input = document.createElement("input");
+		form.appendChild(input);
+		input.setAttribute("type", "checkbox");
+		input.setAttribute("id", game + option);
+		input.setAttribute("name", game + "Weapons");
+		input.setAttribute("value", option);
+		input.setAttribute("checked", "checked");
+		
+		
+		const label = document.createElement("label");
+		form.appendChild(label);
+		label.setAttribute("for", game + option);
+		if(option === "All"){
+			switch(game){
+				case "genshin":
+					label.innerHTML = "All Weapons";
+					break;
+				case "hsr":
+					label.innerHTML = "All Paths";
+					break;
+				case "zzz":
+					label.innerHTML = "All Specialties";
+					break;
+				case "wuwa":
+					label.innerHTML = "All Weapons";
+					break;
+				default:
+					alert("Error while creating weapon icons. Found game " + game);
+			}
+		} else {
+			switch(game){
+				case "genshin":
+					label.innerHTML = "<img src=\"https://api.hakush.in/gi/UI/WEAPON_" + option + ".webp\" alt=\"" + option + "\" class=\"selectionImage\"> ";
+					break;
+				case "hsr":
+					label.innerHTML = "<img src=\"https://api.hakush.in/hsr/UI/pathicon/" + option + ".webp\" alt=\"" + option + "\" class=\"selectionImage\"> ";
+					break;
+				case "zzz":
+					label.innerHTML = "<img src=\"https://api.hakush.in/zzz/UI/Icon" + option + ".webp\" alt=\"" + option + "\" class=\"selectionImage\"> ";
+					break;
+				case "wuwa":
+					label.innerHTML = "<img src=\"https://api.hakush.in/ww/UI/Static/SP_IconNor" + option + ".webp\" alt=\"" + option + "\" class=\"selectionImage\"> ";
+					break;
+				default:
+					alert("Error while creating weapon icons. Found game " + game);
+			}
+		}
+		
+	}
+	
+	/*
+	
+	<form id="genshinElements" onclick="changeSelector(event)"  style="display:none">
+	<br>
+		<input type="checkbox" id="genshinAll" name="genshinElements" value="genshinAll" checked="checked">
+		<label for="genshinAll">All Elements</label> 
+		
+		<input type="checkbox" id="genshinPyro" name="genshinElements" value="pyro" checked="checked">
+		<label for="genshinPyro"><img src="https://api.hakush.in/gi/UI/Pyro.webp" alt="Pyro" class="selectionImage"> </label>
+		
+		<input type="checkbox" id="genshinHydro" name="genshinElements" value="hydro" checked="checked">
+		<label for="genshinHydro"><img src="https://api.hakush.in/gi/UI/Hydro.webp" alt="Hydro" class="selectionImage"> </label> 
+		
+		<input type="checkbox" id="genshinAnemo" name="genshinElements" value="pyro" checked="checked">
+		<label for="genshinAnemo"><img src="https://api.hakush.in/gi/UI/Anemo.webp" alt="Anemo" class="selectionImage"> </label> 
+		
+		<input type="checkbox" id="genshinCryo" name="genshinElements" value="cryo" checked="checked">
+		<label for="genshinCryo"><img src="https://api.hakush.in/gi/UI/Cryo.webp" alt="Cryo" class="selectionImage"> </label> 
+		
+		<input type="checkbox" id="genshinGeo" name="genshinElements" value="geo" checked="checked">
+		<label for="genshinGeo"><img src="https://api.hakush.in/gi/UI/Geo.webp" alt="Geo" class="selectionImage"> </label> 
+		
+		<input type="checkbox" id="genshinElectro" name="genshinElements" value="electro" checked="checked">
+		<label for="genshinElectro"><img src="https://api.hakush.in/gi/UI/Electro.webp" alt="Electro" class="selectionImage"> </label> 
+		
+		<input type="checkbox" id="genshinDendro" name="genshinElements" value="dendro" checked="checked">
+		<label for="genshinDendro"><img src="https://api.hakush.in/gi/UI/Dendro.webp" alt="Dendro" class="selectionImage"> </label> 
+	</form>
+	*/
+	createWeaponSelections();
 </script>
 
 </body>
