@@ -49,6 +49,20 @@ button {
   margin-top: 4%;
 }
 
+.tooltip {
+  position: fixed;
+  z-index: 100;
+
+  padding: 10px 20px;
+
+  border: 1px solid #b3c9ce;
+  border-radius: 4px;
+  text-align: center;
+  font: italic 14px/1.3 sans-serif;
+  color: #333;
+  background: #fff;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, .3);
+}
 
 #Selections {
   display: block;
@@ -176,8 +190,10 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		<input type="checkbox" id="raritySelector" name="raritySelector" value="1" checked="checked">
 		<label for="raritySelector">Include 4* characters?</label> 
 		
-		<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
-		<label for="copiumSelector">Copium?</label> 
+		<span id="copiumSelectorSpan"  data-tooltip="Select to include characters that likely won't be playable. Filtering does not apply to these characters.">
+			<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
+			<label for="copiumSelector">Copium?</label>
+		</span>
 	</form>
 	
 	<div id="Selections">
@@ -338,11 +354,19 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 	
 </div>
 
+
+<div style="position: absolute; bottom: 5px; left: 50%;transform: translate(-50%, -50%);">
+Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter</a>.
+</div>
+
+
+
 <script>
 	document.getElementById("startButton").addEventListener("click", start);
 	
 	
 	window.onload = function(){
+		// show the selections based on the radio form
         let elementSelector = document.getElementsByName('game');
 		for (i = 0; i < elementSelector.length; i++) {
 			if (elementSelector[i].checked){
@@ -377,8 +401,6 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			}
         }
 	}
-	
-	// TODO onhover copium selector: explain no element filtering, since element not known
 	
 	function start(){
 		document.getElementById("startFrame").style.display = 'none';
@@ -802,11 +824,11 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 	function changeSelector(event){
 		// Mark all boxes or unmark the "all elements" box
 		if(event.target.tagName.toLowerCase() === 'input'){
-			if(event.target.value.includes("All") && event.target.checked){
-				// Mark all other options
+			if(event.target.value.includes("All")){
+				// Mark or unmark all other options
 				let children = event.target.closest('form').children;
 				for (let i = 0; i < children.length; i++) {
-					children[i].checked = true;
+					children[i].checked = event.target.checked;
 				}
 			} else if(!event.target.checked){
 				// Unmark the all option
@@ -877,6 +899,10 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			form.setAttribute("style", "display:none");
 			form.appendChild(document.createElement("br"));
 			
+			if(game === "genshin"){
+				form.dataset.tooltip = "Has no effect yet for Genshin characters";	
+			}
+			
 			createInput(game, "All", form);
 			const options = gameOptions[game];
 			for(const option of options){
@@ -936,37 +962,75 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 		}
 		
 	}
-	
-	/*
-	
-	<form id="genshinElements" onclick="changeSelector(event)"  style="display:none">
-	<br>
-		<input type="checkbox" id="genshinAll" name="genshinElements" value="genshinAll" checked="checked">
-		<label for="genshinAll">All Elements</label> 
-		
-		<input type="checkbox" id="genshinPyro" name="genshinElements" value="pyro" checked="checked">
-		<label for="genshinPyro"><img src="https://api.hakush.in/gi/UI/Pyro.webp" alt="Pyro" class="selectionImage"> </label>
-		
-		<input type="checkbox" id="genshinHydro" name="genshinElements" value="hydro" checked="checked">
-		<label for="genshinHydro"><img src="https://api.hakush.in/gi/UI/Hydro.webp" alt="Hydro" class="selectionImage"> </label> 
-		
-		<input type="checkbox" id="genshinAnemo" name="genshinElements" value="pyro" checked="checked">
-		<label for="genshinAnemo"><img src="https://api.hakush.in/gi/UI/Anemo.webp" alt="Anemo" class="selectionImage"> </label> 
-		
-		<input type="checkbox" id="genshinCryo" name="genshinElements" value="cryo" checked="checked">
-		<label for="genshinCryo"><img src="https://api.hakush.in/gi/UI/Cryo.webp" alt="Cryo" class="selectionImage"> </label> 
-		
-		<input type="checkbox" id="genshinGeo" name="genshinElements" value="geo" checked="checked">
-		<label for="genshinGeo"><img src="https://api.hakush.in/gi/UI/Geo.webp" alt="Geo" class="selectionImage"> </label> 
-		
-		<input type="checkbox" id="genshinElectro" name="genshinElements" value="electro" checked="checked">
-		<label for="genshinElectro"><img src="https://api.hakush.in/gi/UI/Electro.webp" alt="Electro" class="selectionImage"> </label> 
-		
-		<input type="checkbox" id="genshinDendro" name="genshinElements" value="dendro" checked="checked">
-		<label for="genshinDendro"><img src="https://api.hakush.in/gi/UI/Dendro.webp" alt="Dendro" class="selectionImage"> </label> 
-	</form>
-	*/
 	createWeaponSelections();
+	
+	// From task from https://javascript.info/mousemove-mouseover-mouseout-mouseenter-mouseleave
+	let tooltip;
+
+    document.getElementById('copiumSelectorSpan').addEventListener('mouseover', function(event) {
+      // important: a fast-moving mouse may "jump" right to a child on an annotated node, skipping the parent
+      // so mouseover may happen on a child.
+
+      let anchorElem = event.target.closest('span');
+	  console.log(anchorElem.id);
+
+      if (!anchorElem) return;
+
+      // show tooltip and remember it
+      tooltip = showTooltip(anchorElem, anchorElem.dataset.tooltip);
+    });
+	
+	document.getElementById('genshinWeapons').addEventListener('mouseover', function(event) {
+      // important: a fast-moving mouse may "jump" right to a child on an annotated node, skipping the parent
+      // so mouseover may happen on a child.
+
+      let anchorElem = event.target.closest('form');
+	  console.log(anchorElem.id);
+
+      if (!anchorElem) return;
+
+      // show tooltip and remember it
+      tooltip = showTooltip(anchorElem, anchorElem.dataset.tooltip);
+    });
+
+    document.onmouseout = function() {
+      // it is possible that mouseout triggered, but we're still inside the element
+      // (its target was inside, and it bubbled)
+      // but in this case we'll have an immediate mouseover,
+      // so the tooltip will be destroyed and shown again
+      //
+      // luckily, the "blinking" won't be visible,
+      // as both events happen almost at the same time
+      if (tooltip) {
+        tooltip.remove();
+        tooltip = false;
+      }
+
+    }
+
+
+    function showTooltip(anchorElem, html) {
+      let tooltipElem = document.createElement('div');
+      tooltipElem.className = 'tooltip';
+      tooltipElem.innerHTML = html;
+      document.body.append(tooltipElem);
+
+      let coords = anchorElem.getBoundingClientRect();
+
+      // position the tooltip over the center of the element
+      let left = coords.left + (anchorElem.offsetWidth - tooltipElem.offsetWidth) / 2;
+      if (left < 0) left = 0;
+
+      let top = coords.top - tooltipElem.offsetHeight - 5;
+      if (top < 0) {
+        top = coords.top + anchorElem.offsetHeight + 5;
+      }
+
+      tooltipElem.style.left = left + 'px';
+      tooltipElem.style.top = top + 'px';
+
+      return tooltipElem;
+    }
 </script>
 
 </body>
