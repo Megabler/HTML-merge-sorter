@@ -321,8 +321,8 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 			<h2 id="Round" style="text-align:center">
 				<span id="counter">1</span> / <span id="numRounds">?</span>
 			</h2>
-			<button id="rarityButton" type="button" onclick="notSupported(event)" >Tie</button>
-			<button id="copiumButton" type="button" style="margin-top:40%" onclick="notSupported(event)" >Undo</button>
+			<button id="tieButton" type="button">Tie</button>
+			<button id="copiumButton" type="button" style="margin-top:40%">Undo</button>
 		</span>
 
 		<span id=right class="right">
@@ -355,7 +355,7 @@ tr:nth-child(even) { background: rgb(48,48,48);}
 </div>
 
 
-<div style="position: absolute; bottom: 5px; left: 50%;transform: translate(-50%, -50%);">
+<div style="position: absolute; bottom: 5px; left: 20%;transform: translate(-50%, -50%);">
 Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter</a>.
 </div>
 
@@ -402,8 +402,13 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
         }
 	}
 	
+	/**
+	* Initializes array based on selected game, and displays the main frame
+	* @function
+	*/
 	function start(){
 		document.getElementById("startFrame").style.display = 'none';
+		document.getElementById("tableFrame").style.display = 'none';
 		
 		// Initialize arr with the data from the selected game
         let gameSelector = document.getElementsByName('game');
@@ -459,6 +464,10 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 	
 	
 	//------- Logic behind the sorting
+	/**
+	* Calls the corresponding functions based on the element that was clicked
+	* @function
+	*/
 	function activateSelection(){
 		if(finishVar){
 			// If finished, we should no longer sort
@@ -478,28 +487,43 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 			setTimeout(() => selected.classList.remove('selected'), 200);
 			selectContentRight(selected);
 		} else {
-			// TODO undo and tie buttons
 			const element = event.target;
 			element.classList.add('selected');
 			setTimeout(() => element.classList.remove('selected'), 200);
 			console.log("Neither left nor right was clicked");
+			if(element.id === "tieButton"){
+				tie(event);
+			} else if(element.id === "copiumButton"){
+				// TODO undo buttons
+				notSupported(event);
+			}
 		}
 	}
 	
+	/**
+	* Adds the Entry shown in the left div as the preferred option to the array. Advances internal pointer, and then updates either only the left div, or both divs
+	* @param HTML element that was selected and will be updated
+	* @function
+	*/
 	function selectContentLeft(selected){
-		// Add new preferred element to current subarray
 		curSubarray.push(arr[left][leftIntern]);
 		leftIntern++;
 			
 		let newContent;
 		if(arr[left].length === leftIntern){
-			completeRemainder();
+			finishRight();
+			finishSubarray();
 		} else {
 			newContent = arr[left][leftIntern];
 			update(selected, newContent);
 		}
 	}
 	
+	/**
+	* Adds the Entry shown in the right div as the preferred option to the array. Advances internal pointer, and then updates either only the right div, or both divs
+	* @param HTML element that was selected and will be updated
+	* @function
+	*/
 	function selectContentRight(selected){
 		// Add new preferred element to current subarray
 		curSubarray.push(arr[right][rightIntern]);
@@ -507,48 +531,54 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 			
 		let newContent;
 		if(arr[right].length === rightIntern){
-			completeRemainder();
+			finishLeft();
+			finishSubarray();
 		} else {
 			newContent = arr[right][rightIntern];
 			update(selected, newContent);
 		}
 	}
 	
-	function update(selected, newContent){
-		// Changes the content of the selected element
+	/**
+	* Updates the optionFrame HTML element based on newContent
+	* @param optionFrame HTML element that will be updated
+	* @param newContent {Entry} Entry element that describes the name and image source for the new content
+	* @function
+	*/
+	function update(optionFrame, newContent){
+		// Changes the content of the optionFrame element
 		console.log("Load " + newContent);
-		selected.getElementsByTagName('div')[0].innerHTML = newContent.name;
-		selected.getElementsByTagName('img')[0].src = newContent.imageSrc;
-		selected.getElementsByTagName('img')[0].alt = newContent.name;
+		optionFrame.getElementsByTagName('div')[0].innerHTML = newContent.name;
+		optionFrame.getElementsByTagName('img')[0].src = newContent.imageSrc;
+		optionFrame.getElementsByTagName('img')[0].alt = newContent.name;
 	}
 	
-	function completeRemainder(){
-		// Adds all remaining elements from the right and then the left, and updates pointers and html content accordingly
-		// If called if either left or right is finished, the order in which remaining elements are added is irrelevant
-		finishRight();
-		finishLeft();
-		
+	/**
+	* Add the current subarray to the final runningArray, advance pointers correctly, and updates the option frames.
+	* Should only be called if at least one internal pointer is at its end.
+	* @function
+	*/
+	function finishSubarray(){		
 		runningArray.push(curSubarray);
 		console.log("Adding to new array: " + curSubarray.toString());
 		console.log("size of new array: " + runningArray.length);
 		curSubarray = [];
-		
 		console.log((next === arr.length ) + ", " + ( next + 1 === arr.length))
 		if(next === arr.length || next + 1 === arr.length){
 			// Examined everything once (except one subarray if there is an odd number) so reset pointers
-			console.log("Run finish");
-			finish();
+			console.log("Iteration finished");
+			finishIteration();
 			if(finishVar) return;
 		}
 		
-		// update left
+		// Update left frame and pointers
 		newContent = arr[next][0];
 		update(document.getElementById("left"), newContent); 
 		leftIntern = 0;
 		left = next;
 		next++;
 		
-		// update right
+		// Update right frame and pointers
 		newContent = arr[next][0];
 		update(document.getElementById("right"), newContent); 
 		rightIntern = 0;
@@ -556,14 +586,21 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		next++;
 	}
 	
+	/**
+	* Add the remaining elements from the arr[right] to the subarray
+	* @function
+	*/
 	function finishRight(){
-	// Add the remaining elements from the right subarray to the subarray
 		while(rightIntern < arr[right].length){
 			curSubarray.push(arr[right][rightIntern]);
 			rightIntern++;
 		}
 	}
 	
+	/**
+	* Add the remaining elements from arr[left] to the subarray
+	* @function
+	*/
 	function finishLeft(){
 	// Add the remaining elements from the left subarray to the current subarray
 		while(leftIntern < arr[left].length){
@@ -573,8 +610,12 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 	}
 		
 	
-	function finish(){
-		// Reset pointers and arrays, and potentially stop further selection if finished
+	/**
+	* Reset pointers and arrays. Potentially stop further selection if finished, i.e. if we obtained a clear ranking
+	* Should only be called if all options (except ties or potentially the last element for odd lengths) were examined in the current iteration.
+	* @function
+	*/
+	function finishIteration(){
 		console.log("All elements inspected");
 		document.getElementById("counter").innerHTML = +document.getElementById("counter").innerHTML + 1;
 		if(arr.length % 2 === 1){
@@ -587,7 +628,7 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		console.log("New array: " + arr.toString());
 		next = 0;
 		if(arr.length === 1){
-			// Everything was sorted
+			// Everything was sorted, so we move on to showing results
 			finishVar = true;
 			console.log("Everything sorted");
 			
@@ -599,6 +640,63 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		}
 	}
 	
+	/**
+	* Adds the right element to the tied Entries of the left Entry. Then updates displayed Entries and pointers
+	* @param The event that was triggered. Should be a "click" event
+	* @function
+	*/
+	function tie(event){
+		event.stopPropagation();
+		const leftEntry = arr[left][leftIntern];
+		const rightEntry = arr[right][rightIntern];
+		
+		leftEntry.tie(rightEntry);
+		rightIntern++;
+		leftIntern++;
+		curSubarray.push(leftEntry);
+		console.log(curSubarray);
+		
+		// Advance both internal pointers. If one pointer would then be out of bounds, we advance the outer pointers left and right
+		if(arr[right].length === rightIntern || arr[left].length === leftIntern){
+			finishSubarray();
+		} else {
+			newContent = arr[right][rightIntern];
+			update(document.getElementById('right'), newContent);
+			newContent = arr[left][leftIntern];
+			update(document.getElementById('left'), newContent);
+		}
+	}
+	
+	/**
+	* Calculate how many rounds are needed to compare everything and set it in the HTML file
+	* @function
+	*/
+	function setNumRounds(){
+		const numRounds = Math.ceil(Math.log2(arr.length));
+		document.getElementById("numRounds").innerHTML = numRounds;
+	}
+	
+	/**
+	* Displays the first two Entry in the left and right option frame, and unhides the main frame
+	* @function
+	*/
+	function initializeFirstOptions(){
+		document.getElementById("left").getElementsByTagName('div')[0].innerHTML = arr[0][0].name;
+		document.getElementById("left").getElementsByTagName('img')[0].src = arr[0][0].imageSrc;
+		document.getElementById("left").getElementsByTagName('img')[0].alt = arr[0][0].name;
+		
+		document.getElementById("right").getElementsByTagName('div')[0].innerHTML = arr[1][0].name;
+		document.getElementById("right").getElementsByTagName('img')[0].src = arr[1][0].imageSrc;
+		document.getElementById("right").getElementsByTagName('img')[0].alt = arr[1][0].name;
+		
+		document.getElementById("frame").style.display = '';
+	}
+	
+	//----- Result representation
+	/**
+	* Hides other frames and displays only the table frame. Then creates a table inside the table frame
+	* @function
+	*/
 	function showResults(){
 		console.log("Change table");
 		
@@ -607,7 +705,7 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		document.getElementById("tableFrame").style.display = '';
 		
 		let numImages = document.getElementById("imgNumbers").value;
-		console.log(numImages);
+		
 		if(numImages === "none"){
 			numImages = 0;
 		} else if(numImages === "all"){
@@ -615,10 +713,14 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		} else {
 			numImages = +numImages;
 		}
-		console.log(numImages);
 		createTable(numImages);
 	}
 	
+	/**
+	* Resets the table displaying the results, and recreates it
+	* @param numImages {number} Until which rank an image should be displayed. E.g. for numImages = 2, then only entries with rank 1 or 2 are displayed with an image
+	* @function
+	*/
 	function createTable(numImages){
 		// https://stackoverflow.com/questions/14643617/create-table-using-javascript
 		const tbl = document.getElementById('resultTable');
@@ -633,44 +735,50 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 				  appendChild(document.createTextNode(orderArrayHeader[i]));
 		}
 		
-		for (let i = 0; i < arr.length; i++) {
-			const tr = tbl.insertRow();
-			
-			let td = tr.insertCell();
-			td.appendChild(document.createTextNode(i + 1));
-			
-			td = tr.insertCell();
-			if(i < numImages){
-				const img = document.createElement('img');
-				img.src = arr[i].imageSrc;
-				td.appendChild(img);
+		for (let counter = 0; counter < arr.length; counter++) {
+			insertRowFunc(counter + 1, arr[counter], tbl, numImages);
+			// Add the elements that tied with the current element 
+			for(const tieEntry of arr[counter].ties){
+				insertRowFunc(counter + 1, tieEntry, tbl, counter < numImages);
 			}
-			
-			td = tr.insertCell();
-			td.appendChild(document.createTextNode(arr[i].name));
+			counter += arr[counter].ties.length;
 		}
 	}
 	
-	function setNumRounds(){
-		// Calculate how many rounds are needed to compare everything and set it in the html
-		let numRounds = Math.ceil(Math.log2(arr.length));
-		console.log(2**numRounds, arr.length);
-		document.getElementById("numRounds").innerHTML = numRounds;
-	}
-	
-	function initializeFirstOptions(){
-		document.getElementById("left").getElementsByTagName('div')[0].innerHTML = arr[0][0].name;
-		document.getElementById("left").getElementsByTagName('img')[0].src = arr[0][0].imageSrc;
-		document.getElementById("left").getElementsByTagName('img')[0].alt = arr[0][0].name;
-		console.log(document.getElementById("left").getElementsByTagName('img')[0].classList);
+	/**
+	* Creates a row based on rank and entry, and insert it into the table tbl
+	* @param rank {number} The rank of the entry
+	* @param entry {Object} The entry of the game character
+	* @param tbl The HTML table into which the row is inserted
+	* @param displayImage {boolean} The rank of the entry
+	* @function
+	*/
+	function insertRowFunc(rank, entry, tbl, displayImage){
+		// Create a table row to insert into tbl.
+		// The row's cells are: rank in the first column, the entry's name in the third column, and entry's image in the second column if displayImage
+		const tr = tbl.insertRow();
 		
-		document.getElementById("right").getElementsByTagName('div')[0].innerHTML = arr[1][0].name;
-		document.getElementById("right").getElementsByTagName('img')[0].src = arr[1][0].imageSrc;
-		document.getElementById("right").getElementsByTagName('img')[0].alt = arr[1][0].name;
-		document.getElementById("frame").style.display = '';
+		let td = tr.insertCell();
+		td.appendChild(document.createTextNode(rank));
+		
+		td = tr.insertCell();
+		if(displayImage){
+			const img = document.createElement('img');
+			img.src = entry.imageSrc;
+			td.appendChild(img);
+		}
+		
+		td = tr.insertCell();
+		td.appendChild(document.createTextNode(entry.name));
+		console.log("Main: " + entry);
 	}
 	
 	//----- Initizialize arrays with fixed values	
+	/**
+	* Returns an array of Entry containing predefined values. The values are filtered according to the forms the user selected/deselected.
+	* @return {Array] Array of predefined, filtered Entry elements
+	* @function
+	*/
 	function initalizeArrayWithGenshin(){
 		let newArr = [];
 		const include4Stars = document.getElementById("raritySelector").checked;
@@ -697,6 +805,11 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return newArr;
 	}
 	
+	/**
+	* Returns an array of Entry containing predefined values. The values are filtered according to the forms the user selected/deselected.
+	* @return {Array] Array of predefined, filtered Entry elements
+	* @function
+	*/
 	function initalizeArrayWithHSR(){
 		let newArr = [];
 		const include4Stars = document.getElementById("raritySelector").checked;
@@ -724,17 +837,22 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return newArr;
 	}
 	
+	/**
+	* Returns an array of Entry containing predefined values. The values are filtered according to the forms the user selected/deselected.
+	* @return {Array] Array of predefined, filtered Entry elements
+	* @function
+	*/
 	function initalizeArrayWithZZZ(){
 		let newArr = [];
 		const include4Stars = document.getElementById("raritySelector").checked;
 		
 		const inter = [
-			["01", "four", "Anby", "Stun" ,"Electric"], ["11", "five", "Nekomata", "AttackType" ,"Physical"], ["12", "four", "Nicole", "Support" ,"Ether"], ["05", "five", "Soldier 11", "AttackType" ,"Fire"], ["52", "five", "Yidhari", "Rupture" ,"Ice"], ["09", "four", "Corin", "AttackType" ,"Physical"], ["25", "five", "Caesar", "Defense" ,"Physical"], ["10", "four", "Billy", "AttackType" ,"Physical"], ["13", "five", "Miyabi", "Anomaly" ,"Frost"], ["14", "five", "Koleda", "Stun" ,"Fire"], ["15", "four", "Anton", "AttackType" ,"Electric"], ["16", "four", "Ben", "Defense" ,"Fire"], ["17", "four", "Soukaku", "Support" ,"Ice"], ["18", "five", "Lycaon", "Stun" ,"Ice"], ["27", "four", "Lucy", "Support" ,"Fire"], ["26", "five", "Lighter", "Stun" ,"Fire"], ["32", "five", "Burnice", "Anomaly" ,"Fire"], ["20", "five", "Grace", "Anomaly" ,"Electric"], ["21", "five", "Ellen", "AttackType" ,"Ice"], ["35", "five", "Harumasa", "AttackType" ,"Electric"], ["22", "five", "Rina", "Support" ,"Electric"], ["31", "five", "Yanagi", "Anomaly" ,"Electric"], ["23", "five", "Zhu Yuan", "AttackType" ,"Ether"], ["29", "five", "Qingyi", "Stun" ,"Electric"], ["24", "five", "Jane", "Anomaly" ,"Physical"], ["30", "four", "Seth", "Defense" ,"Electric"], ["28", "four", "Piper", "Anomaly" ,"Physical"], ["42", "five", "Hugo", "AttackType" ,"Ice"], ["49", "five", "Orphie &amp; Magus", "AttackType" ,"Fire"], ["36", "five", "Astra Yao", "Support" ,"Ether"], ["37", "five", "Evelyn", "AttackType" ,"Fire"], ["41", "five", "Vivian", "Anomaly" ,"Ether"], ["38", "four", "Pulchra", "Stun" ,"Physical"], ["39", "five", "Trigger", "Stun" ,"Electric"], ["44", "five", "Yixuan", "Rupture" ,"AuricInk"], ["40", "five", "Soldier 0 - Anby", "AttackType" ,"Electric"], ["43", "five", "Ju Fufu", "Stun" ,"Fire"], ["46", "five", "Alice", "Anomaly" ,"Physical"], ["47", "five", "Yuzuha", "Support" ,"Physical"], ["45", "four", "Pan Yinhu", "Defense" ,"Physical"], ["51", "four", "Manato", "Rupture" ,"Fire"], ["50", "five", "Lucia", "Support" ,"Ether"], ["48", "five", "Seed", "AttackType" ,"Electric"], ["53", "five", "Avatar_Male_Size03_BanYue", "Rupture" ,"Fire"], ["54", "five", "Azural", "Stun" ,"Physical"], 
+			["01", "four", "Anby", "Stun" ,"Electric"], ["11", "five", "Nekomata", "AttackType" ,"Physical"], ["12", "four", "Nicole", "Support" ,"Ether"], ["05", "five", "Soldier 11", "AttackType" ,"Fire"], ["52", "five", "Yidhari", "Rupture" ,"Ice"], ["09", "four", "Corin", "AttackType" ,"Physical"], ["25", "five", "Caesar", "Defense" ,"Physical"], ["10", "four", "Billy", "AttackType" ,"Physical"], ["13", "five", "Miyabi", "Anomaly" ,"Frost"], ["14", "five", "Koleda", "Stun" ,"Fire"], ["15", "four", "Anton", "AttackType" ,"Electric"], ["16", "four", "Ben", "Defense" ,"Fire"], ["17", "four", "Soukaku", "Support" ,"Ice"], ["18", "five", "Lycaon", "Stun" ,"Ice"], ["27", "four", "Lucy", "Support" ,"Fire"], ["26", "five", "Lighter", "Stun" ,"Fire"], ["32", "five", "Burnice", "Anomaly" ,"Fire"], ["20", "five", "Grace", "Anomaly" ,"Electric"], ["21", "five", "Ellen", "AttackType" ,"Ice"], ["35", "five", "Harumasa", "AttackType" ,"Electric"], ["22", "five", "Rina", "Support" ,"Electric"], ["31", "five", "Yanagi", "Anomaly" ,"Electric"], ["23", "five", "Zhu Yuan", "AttackType" ,"Ether"], ["29", "five", "Qingyi", "Stun" ,"Electric"], ["24", "five", "Jane", "Anomaly" ,"Physical"], ["30", "four", "Seth", "Defense" ,"Electric"], ["28", "four", "Piper", "Anomaly" ,"Physical"], ["42", "five", "Hugo", "AttackType" ,"Ice"], ["49", "five", "Orphie &amp; Magus", "AttackType" ,"Fire"], ["36", "five", "Astra Yao", "Support" ,"Ether"], ["37", "five", "Evelyn", "AttackType" ,"Fire"], ["41", "five", "Vivian", "Anomaly" ,"Ether"], ["38", "four", "Pulchra", "Stun" ,"Physical"], ["39", "five", "Trigger", "Stun" ,"Electric"], ["44", "five", "Yixuan", "Rupture" ,"AuricInk"], ["40", "five", "Soldier 0 - Anby", "AttackType" ,"Electric"], ["43", "five", "Ju Fufu", "Stun" ,"Fire"], ["46", "five", "Alice", "Anomaly" ,"Physical"], ["47", "five", "Yuzuha", "Support" ,"Physical"], ["45", "four", "Pan Yinhu", "Defense" ,"Physical"], ["51", "four", "Manato", "Rupture" ,"Fire"], ["50", "five", "Lucia", "Support" ,"Ether"], ["48", "five", "Seed", "AttackType" ,"Electric"], ["53", "five", "Banyue", "Rupture" ,"Fire"], ["54", "five", "Dialyn", "Stun" ,"Physical"], 
 		];
 		for(const entry of inter){
 			entry[4] = specialTerm(entry[4]);
 			const elementId = "zzz" + capitalizeFirstLetter(entry[4]);
-			const weaponId = "zzz" + capitalizeFirstLetter(entry[3]);
+			const weaponId = "zzz" + capitalizeFirstLetter(entry[3]) + "Weapons";
 			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/zzz/UI/IconRoleCrop" + entry[0] + ".webp")]);
 			}
@@ -751,6 +869,11 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return newArr;
 	}
 	
+	/**
+	* Returns an array of Entry containing predefined values. The values are filtered according to the forms the user selected/deselected.
+	* @return {Array] Array of predefined, filtered Entry elements
+	* @function
+	*/
 	function initalizeArrayWithWuWa(){
 		let newArr = [];
 		const include4Stars = document.getElementById("raritySelector").checked;
@@ -760,7 +883,7 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		];
 		for(const entry of inter){
 			const elementId = "wuwa" + capitalizeFirstLetter(entry[4]);
-			const weaponId = "wuwa" + capitalizeFirstLetter(entry[3]);
+			const weaponId = "wuwa" + capitalizeFirstLetter(entry[3]) + "Weapons";
 			console.log(weaponId);
 			if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
 				newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/ww/UI/UIResources/Common/Image/IconRoleHead256/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
@@ -776,28 +899,11 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return newArr;
 	}
 	
-	class Entry {
-
-	constructor(name, rarity, imageSrc) {
-		this.name = name;
-		this.rarity = rarity;
-		this.imageSrc = imageSrc;
-		//console.log("Created entry for " + name);
-	}
-
-	}
-
-	Entry.prototype.toString = function() {
-		return "[" + this.name + ", " + this.rarity + "]";
-	}
-	
-	function notSupported(event){
-		event.preventDefault();
-		alert("Not implemented yet, sorry!");
-	}
-	
-	
-	
+	/**
+	* Returns an array of Entry containing predefined values. Contains fewer elements and ignores filtering for faster testing
+	* @return {Array] Array of predefined, filtered Entry elements
+	* @function
+	*/
 	function testInit(){
 		let newArr = [];
 		const include4Stars = document.getElementById("raritySelector").checked;
@@ -821,25 +927,66 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return newArr;
 	}
 	
+	/**
+	* Entry class that represents a character and which characters are tied with it
+	* @class
+	* @classdesc Entry class that represents a character
+	*/
+	class Entry {
+
+		constructor(name, rarity, imageSrc) {
+			this.name = name;
+			this.rarity = rarity;
+			this.imageSrc = imageSrc;
+			this.ties = [];
+			//console.log("Created entry for " + name);
+		}
+		
+		tie(otherEntry){
+			this.ties.push(otherEntry);
+			this.ties = this.ties.concat(otherEntry.ties);
+		}
+
+	}
+
+	Entry.prototype.toString = function() {
+		return "[" + this.name + ", " + this.rarity + "]";
+	}
+	
+	function notSupported(event){
+		event.preventDefault();
+		alert("Not implemented yet, sorry!");
+	}
+	
+	/**
+	* Changes the other corresponding input form if the event triggers on an "All" input form, or unchecks the corresponding "All" input form
+	* @function
+	*/
 	function changeSelector(event){
-		// Mark all boxes or unmark the "all elements" box
+		console.log(event.target);
 		if(event.target.tagName.toLowerCase() === 'input'){
 			if(event.target.value.includes("All")){
-				// Mark or unmark all other options
+				// Check or uncheck all other options
 				let children = event.target.closest('form').children;
+				console.log(event.target.value);
 				for (let i = 0; i < children.length; i++) {
 					children[i].checked = event.target.checked;
 				}
 			} else if(!event.target.checked){
-				// Unmark the all option
+				// Uncheck the all option
 				const parentForm = event.target.closest('form');
 				parentForm.querySelector('input').checked = false;
+			} else {
+				// TODO check the all option if every input form is now checked
 			}
 		}
 	}
 	
+	/**
+	*  Change which element and weapon icons are displayed depending on the selected games
+	* @function
+	*/
 	function changeSelectorDisplayed(event){
-		// Change which element and weapon icons are displayed depending on the selected games
 		if(event.target.tagName.toLowerCase() === 'input'){
 			const selectors = document.getElementById("Selections").children;
 			if(event.target.value === "all"){
@@ -849,19 +996,19 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 						form.style.display = '';
 					}
 				}
-				return;
-			}
-			// First hide all, and then show the one that was clicked on 
-			for(const forms of selectors){
-				for(const form of forms.children){
-					form.style.display = 'none';
+			} else {
+				// First hide all selections, and then show the one that was clicked on 
+				for(const forms of selectors){
+					for(const form of forms.children){
+						form.style.display = 'none';
+					}
 				}
+				
+				console.log(event.target.value + "Elements");
+				document.getElementById(event.target.value + "Elements").style.display = '';
+				console.log(event.target.value + "Weapons");
+				document.getElementById(event.target.value + "Weapons").style.display = '';
 			}
-			
-			console.log(event.target.value + "Elements");
-			document.getElementById(event.target.value + "Elements").style.display = '';
-			console.log(event.target.value + "Weapons");
-			document.getElementById(event.target.value + "Weapons").style.display = '';
 		}
 	}
 	
@@ -869,12 +1016,20 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 	}
 	
+	/**
+	* Rename certain terms to the more general version, e.g. Void Hunter element types to the overarching element. Keeps the original term if it already is the general term
+	* @param val {string} The term as string to rewrite
+	* @return {string} The corresponding term
+	* @function
+	*/
 	function specialTerm(val){
 		switch(val){
 			case "Frost":
 				return "Ice";
 			case "AuricInk":
 				return "Ether";
+			case "HonedEdge":
+				return "Physical";
 			default:
 				return val;
 		}
@@ -882,6 +1037,10 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 	
 	// TODO createElementSelections()
 	
+	/**
+	* Create a HTML form for each game
+	* @function
+	*/
 	function createWeaponSelections(){
 		const frame = document.getElementById("weaponSelection");
 		const games = ["genshin", "hsr", "zzz", "wuwa"];
@@ -911,20 +1070,26 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		}
 	}
 	
+	/**
+	* Create a HTML checkbox input and corresponding label based on game and option to append to the form
+	* @param game {string} Name of game
+	* @param option {string} 
+	* @param form HTML form element to append the input element to
+	* @function
+	*/
 	function createInput(game, option, form){
-		// Creates a checkbox input and corresponding label and appends it to form
 		const input = document.createElement("input");
 		form.appendChild(input);
 		input.setAttribute("type", "checkbox");
-		input.setAttribute("id", game + option);
+		input.setAttribute("id", game + option + "Weapons");
 		input.setAttribute("name", game + "Weapons");
-		input.setAttribute("value", option);
+		input.setAttribute("value", game + option + "Weapons");
 		input.setAttribute("checked", "checked");
 		
 		
 		const label = document.createElement("label");
 		form.appendChild(label);
-		label.setAttribute("for", game + option);
+		label.setAttribute("for", game + option + "Weapons");
 		if(option === "All"){
 			switch(game){
 				case "genshin":
@@ -962,9 +1127,10 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		}
 		
 	}
+	
 	createWeaponSelections();
 	
-	// From task from https://javascript.info/mousemove-mouseover-mouseout-mouseenter-mouseleave
+	//---------------- Add hover option From task from https://javascript.info/mousemove-mouseover-mouseout-mouseenter-mouseleave
 	let tooltip;
 
     document.getElementById('copiumSelectorSpan').addEventListener('mouseover', function(event) {
@@ -1008,7 +1174,10 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 
     }
 
-
+	/**
+	* Creates a tooltip textbox above the anchor element 
+	* @function
+	*/
     function showTooltip(anchorElem, html) {
       let tooltipElem = document.createElement('div');
       tooltipElem.className = 'tooltip';
