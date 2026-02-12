@@ -1,6 +1,6 @@
 //createWeaponSelections();
 //document.getElementById("startButton").addEventListener("click", start);
-
+let debug = false;
 
 window.onload = function(){
 	// Show the selections based on the radio form
@@ -128,7 +128,7 @@ function activateSelection(){
 		const element = event.target;
 		element.classList.add('selected');
 		setTimeout(() => element.classList.remove('selected'), 200);
-		console.log("Neither left nor right was clicked");
+		
 		if(element.id === "tieButton"){
 			tie(event);
 		} else if(element.id === "copiumButton"){
@@ -185,25 +185,27 @@ function selectContentRight(selected){
 */
 function update(optionFrame, newContent){
 	// Changes the content of the optionFrame element
-	console.log("Load " + newContent);
+	//console.log("Load " + newContent);
 	optionFrame.getElementsByTagName('div')[0].innerHTML = newContent.name;
 	optionFrame.getElementsByTagName('img')[0].src = newContent.imageSrc;
 	optionFrame.getElementsByTagName('img')[0].alt = newContent.name;
 }
 
 /**
-* Add the current subarray to the final runningArray, advance pointers correctly, and updates the option frames.
+* Add the current subarray to the final runningArray, advance pointers correctly, and update the option frames.
 * Should only be called if at least one internal pointer is at its end.
 * @function
 */
 function finishSubarray(){		
 	runningArray.push(curSubarray);
-	console.log("Adding to new array: " + curSubarray.toString());
-	console.log("size of new array: " + runningArray.length);
+	if(debug){
+		console.log("Adding to new array: " + curSubarray.toString());
+		console.log("size of new array: " + runningArray.length);
+	}
 	curSubarray = [];
-	console.log((next === arr.length ) + ", " + ( next + 1 === arr.length))
+	
+	// Check if an iteration is finished, if all elements (except one for odd amount of elements) were examined
 	if(next === arr.length || next + 1 === arr.length){
-		// Examined everything once (except one subarray if there is an odd number) so reset pointers
 		console.log("Iteration finished");
 		finishIteration();
 		if(finishVar) return;
@@ -272,6 +274,8 @@ function finishIteration(){
 		
 		// Flatten array 
 		arr = arr[0];
+		console.log("Final sorting: ")
+		console.log(arr);
 		
 		document.getElementById("Main").style.display = 'none';
 		showResults();
@@ -292,10 +296,12 @@ function tie(event){
 	rightIntern++;
 	leftIntern++;
 	curSubarray.push(leftEntry);
-	console.log(curSubarray);
 	
-	// Advance both internal pointers. If one pointer would then be out of bounds, we advance the outer pointers left and right
+	// Advance both internal pointers. If one pointer would then be out of bounds, we add the remaining elements of the other pointer and then advance the outer pointers left and right
 	if(arr[right].length === rightIntern || arr[left].length === leftIntern){
+		// Calling finishLeft (finishRight) if leftIntern (rightIntern) is out of bounds does nothing. So we call both to not distinguish between which pointer is out of bounds
+		finishLeft()
+		finishRight()
 		finishSubarray();
 	} else {
 		newContent = arr[right][rightIntern];
@@ -373,22 +379,23 @@ function createTable(numImages){
 			  appendChild(document.createTextNode(orderArrayHeader[i]));
 	}
 	
+	let ranking = 1;
 	for (let counter = 0; counter < arr.length; counter++) {
-		insertRowFunc(counter + 1, arr[counter], tbl, numImages);
-		// Add the elements that tied with the current element 
+		insertRowFunc(ranking, arr[counter], tbl, counter < numImages);
+		// Add the elements that tied with the current element and give them the same rank
 		for(const tieEntry of arr[counter].ties){
-			insertRowFunc(counter + 1, tieEntry, tbl, counter < numImages);
+			insertRowFunc(ranking, tieEntry, tbl, counter < numImages);
 		}
-		counter += arr[counter].ties.length;
+		ranking += arr[counter].ties.length + 1; // Update ranks. If there are e.g. 2 first places (i.e. arr[1].tie.length == 1), then there is no second place, and the next best is third place
 	}
 }
 
 /**
 * Creates a row based on rank and entry, and insert it into the table tbl
 * @param rank {number} The rank of the entry
-* @param entry {Object} The entry of the game character
+* @param entry {Object} The entry of the game character, containing the name and source to an image
 * @param tbl The HTML table into which the row is inserted
-* @param displayImage {boolean} The rank of the entry
+* @param displayImage {boolean} Whether the image should be displayed in the table
 * @function
 */
 function insertRowFunc(rank, entry, tbl, displayImage){
@@ -408,7 +415,7 @@ function insertRowFunc(rank, entry, tbl, displayImage){
 	
 	td = tr.insertCell();
 	td.appendChild(document.createTextNode(entry.name));
-	console.log("Main: " + entry);
+	//console.log("Main: " + entry);
 }
 
 function notSupported(event){
