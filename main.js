@@ -410,6 +410,7 @@ function insertRowFunc(rank, entry, tbl, displayImage){
 	if(displayImage){
 		const img = document.createElement('img');
 		img.src = entry.imageSrc;
+		img.classList.add('characterImgTable');
 		td.appendChild(img);
 	}
 	

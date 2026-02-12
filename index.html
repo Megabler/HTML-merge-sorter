@@ -281,8 +281,13 @@
 
 <!-- The table frame that shows the result-->
 <div id="tableFrame" style="display:none">
-	<button id="backButton" type="button" style="margin-bottom: 5%;" onclick="notSupported(event)" >Return!</button>
+	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" onclick="notSupported(event)" >Return!</button>
 	
+	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" onclick="convertToImage(event)" >Download Table</button>
+	
+    <div id="tableImageLink" class="tableButton" style="top: 250px">
+       <!-- Result will appear be here -->
+	</div>
 	
 	<form id="imageNumberSelector">
 	<label for="imgNumbers">Number of images:</label>
@@ -311,6 +316,24 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 <script src="tooltip.js"></script> 
 <script src="main.js"></script>
 
+<!-- taken from https://stackoverflow.com/questions/53757970/downloading-data-tables-from-html-as-image  and  https://stackoverflow.com/questions/30372417/html2canvas-not-rendering-image-externally-hosted-images -->
+<script type="text/javascript" src="https://github.com/niklasvh/html2canvas/releases/download/0.5.0-alpha1/html2canvas.js"></script>
+<script>
+	//convert table to image            
+	function convertToImage() {
+	var resultDiv = document.getElementById("tableImageLink");
+	html2canvas(document.getElementById("resultTable"), {
+		useCORS: true, // taken from https://stackoverflow.com/questions/30372417/html2canvas-not-rendering-image-externally-hosted-images
+		onrendered: function(canvas) {
+			var img = canvas.toDataURL("image/png");
+			tableImageLink.innerHTML = '<a download="test.jpeg" href="'+img+'">Download table as png!</a>';
+			}
+	});
+	}        
+	//click event
+	var convertBtn = document.getElementById("tableToImageButton");
+	convertBtn.addEventListener('click', convertToImage);
+</script>
 
 </body>
 </html> 
