@@ -127,13 +127,13 @@ function initalizeArrayWithGenshin(){
 		const elementId = "genshin" + capitalizeFirstLetter(entry[3]);
 		const weaponId = "genshin" + entry[4] + "Weapons";
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/gi/UI/UI_AvatarIcon_" + entry[0] + ".webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/genshin/chars/UI_AvatarIcon_" + entry[0] + ".webp")]);
 		}
 	}
 	
 	// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
 	if(document.getElementById("copiumSelector").checked) {
-		newArr.push([new Entry("Capitano", "five", "")]);
+		newArr.push([new Entry("Capitano", "five", "copium/capitano.jpg")]);
 		newArr.push([new Entry("Kitsune Saiguu", "five", "")]);
 		newArr.push([new Entry("Signora", "five", "")]);
 		newArr.push([new Entry("Rerir", "five", "")]);
@@ -235,7 +235,7 @@ function initalizeArrayWithHSR(){
 		const elementId = "hsr" + capitalizeFirstLetter(entry[3]);
 		const weaponId = "hsr" + entry[4] + "Weapons";
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/hsr/UI/avatarshopicon/" + entry[0] + ".webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/hsr/chars/" + entry[0] + ".webp")]);
 		}
 	}
 	
@@ -313,7 +313,7 @@ function initalizeArrayWithZZZ(){
 		const elementId = "zzz" + capitalizeFirstLetter(entry[4]);
 		const weaponId = "zzz" + capitalizeFirstLetter(entry[3]) + "Weapons";
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/zzz/UI/IconRoleCrop" + entry[0] + ".webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/zzz/chars/IconRoleCrop" + entry[0] + ".webp")]);
 		}
 	}
 	
@@ -391,7 +391,7 @@ function initalizeArrayWithWuWa(){
 		const weaponId = "wuwa" + capitalizeFirstLetter(entry[3]) + "Weapons";
 		console.log(weaponId);
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "https://api.hakush.in/ww/UI/UIResources/Common/Image/IconRoleHead256/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/wuwa/chars/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
 		}
 	}
 	
