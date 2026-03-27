@@ -76,6 +76,8 @@ function start(){
 		}
 	}
 	//arr = testInit();
+	numExaminedCharacters = 0;
+	numTotalCharacters = arr.length;
 	
 	if(arr.length < 2){
 		alert("Not enough options available. Immediately show results");
@@ -89,6 +91,8 @@ function start(){
 }
 
 let arr = [];
+let numExaminedCharacters = 0;
+let numTotalCharacters = arr.length;
 
 let next = 2;
 let left = 0;
@@ -117,25 +121,24 @@ function activateSelection(){
 	console.log(arr);
 	
 	if(selected.classList.contains("left")){
-		selected.classList.add('selected');
-		setTimeout(() => selected.classList.remove('selected'), 200);
+		highlightOption(selected);
 		selectContentLeft(selected);
 	} else if(selected.classList.contains("right")) {
-		selected.classList.add('selected');
-		setTimeout(() => selected.classList.remove('selected'), 200);
+		highlightOption(selected);
 		selectContentRight(selected);
 	} else {
-		const element = event.target;
-		element.classList.add('selected');
-		setTimeout(() => element.classList.remove('selected'), 200);
+		const selectedElement = event.target;
+		highlightOption(selectedElement);
 		
-		if(element.id === "tieButton"){
+		if(selectedElement.id === "tieButton"){
 			tie(event);
-		} else if(element.id === "copiumButton"){
+		} else if(selectedElement.id === "undoButton"){
 			// TODO undo buttons
 			notSupported(event);
 		}
 	}
+	
+	updateRoundPercent();
 }
 
 /**
@@ -146,6 +149,7 @@ function activateSelection(){
 function selectContentLeft(selected){
 	curSubarray.push(arr[left][leftIntern]);
 	leftIntern++;
+	numExaminedCharacters++;
 		
 	let newContent;
 	if(arr[left].length === leftIntern){
@@ -166,6 +170,7 @@ function selectContentRight(selected){
 	// Add new preferred element to current subarray
 	curSubarray.push(arr[right][rightIntern]);
 	rightIntern++;
+	numExaminedCharacters++;
 		
 	let newContent;
 	if(arr[right].length === rightIntern){
@@ -175,6 +180,17 @@ function selectContentRight(selected){
 		newContent = arr[right][rightIntern];
 		update(selected, newContent);
 	}
+}
+
+/**
+* Displays the first two Entry in the left and right option frame, and unhides the main frame
+* @function
+*/
+function initializeFirstOptions(){
+	update(document.getElementById("left"), arr[0][0]);
+	update(document.getElementById("right"), arr[1][0]);
+	
+	document.getElementById("frame").style.display = '';
 }
 
 /**
@@ -234,6 +250,7 @@ function finishRight(){
 	while(rightIntern < arr[right].length){
 		curSubarray.push(arr[right][rightIntern]);
 		rightIntern++;
+		numExaminedCharacters++;
 	}
 }
 
@@ -246,6 +263,7 @@ function finishLeft(){
 	while(leftIntern < arr[left].length){
 		curSubarray.push(arr[left][leftIntern]);
 		leftIntern++;
+		numExaminedCharacters++;
 	}
 }
 	
@@ -257,7 +275,7 @@ function finishLeft(){
 */
 function finishIteration(){
 	console.log("All elements inspected");
-	document.getElementById("counter").innerHTML = +document.getElementById("counter").innerHTML + 1;
+	document.getElementById("roundCounter").innerHTML = +document.getElementById("roundCounter").innerHTML + 1;
 	if(arr.length % 2 === 1){
 		// Add the last element that was not inspected in the last round to the front
 		runningArray.unshift(arr[arr.length - 1]);
@@ -265,6 +283,7 @@ function finishIteration(){
 	
 	arr = runningArray;
 	runningArray = [];
+	numExaminedCharacters = 0;
 	console.log("New array: " + arr.toString());
 	next = 0;
 	if(arr.length === 1){
@@ -292,14 +311,14 @@ function tie(event){
 	const leftEntry = arr[left][leftIntern];
 	const rightEntry = arr[right][rightIntern];
 	
-	leftEntry.tie(rightEntry);
+	numExaminedCharacters+= leftEntry.tie(rightEntry) + 1;
 	rightIntern++;
 	leftIntern++;
 	curSubarray.push(leftEntry);
 	
-	// Advance both internal pointers. If one pointer would then be out of bounds, we add the remaining elements of the other pointer and then advance the outer pointers left and right
+	// If one internal pointer is out of bounds, we add the remaining elements of the other pointer and then advance the outer pointers left and right
 	if(arr[right].length === rightIntern || arr[left].length === leftIntern){
-		// Calling finishLeft (finishRight) if leftIntern (rightIntern) is out of bounds does nothing. So we call both to not distinguish between which pointer is out of bounds
+		// Calling finishLeft (finishRight) if leftIntern (rightIntern) is out of bounds does nothing. So we call both to not have two cases between which pointer is out of bounds
 		finishLeft()
 		finishRight()
 		finishSubarray();
@@ -321,19 +340,12 @@ function setNumRounds(){
 }
 
 /**
-* Displays the first two Entry in the left and right option frame, and unhides the main frame
+* Calculate how much percent of the characters were examined in this round and sets it in the HTML file
 * @function
 */
-function initializeFirstOptions(){
-	document.getElementById("left").getElementsByTagName('div')[0].innerHTML = arr[0][0].name;
-	document.getElementById("left").getElementsByTagName('img')[0].src = arr[0][0].imageSrc;
-	document.getElementById("left").getElementsByTagName('img')[0].alt = arr[0][0].name;
-	
-	document.getElementById("right").getElementsByTagName('div')[0].innerHTML = arr[1][0].name;
-	document.getElementById("right").getElementsByTagName('img')[0].src = arr[1][0].imageSrc;
-	document.getElementById("right").getElementsByTagName('img')[0].alt = arr[1][0].name;
-	
-	document.getElementById("frame").style.display = '';
+function updateRoundPercent() {
+	const percent = Math.floor((numExaminedCharacters / numTotalCharacters) * 1000) / 10;
+	document.getElementById("roundPercent").innerHTML = percent;
 }
 
 //----- Result representation
@@ -381,10 +393,10 @@ function createTable(numImages){
 	
 	let ranking = 1;
 	for (let counter = 0; counter < arr.length; counter++) {
-		insertRowFunc(ranking, arr[counter], tbl, ranking <= numImages);
+		insertRowFunc(ranking, arr[counter], tbl, counter < numImages);
 		// Add the elements that tied with the current element and give them the same rank
 		for(const tieEntry of arr[counter].ties){
-			insertRowFunc(ranking, tieEntry, tbl, ranking <= numImages);
+			insertRowFunc(ranking, tieEntry, tbl, counter < numImages);
 		}
 		ranking += arr[counter].ties.length + 1; // Update ranks. If there are e.g. 2 first places (i.e. arr[1].tie.length == 1), then there is no second place, and the next best is third place
 	}
@@ -570,3 +582,7 @@ function createInput(game, option, form){
 	
 }
 
+function highlightOption(selectedElement){
+	selectedElement.classList.add('selected');
+	setTimeout(() => selectedElement.classList.remove('selected'), 200);
+}
