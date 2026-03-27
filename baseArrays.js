@@ -449,9 +449,15 @@ class Entry {
 		//console.log("Created entry for " + name);
 	}
 	
+	/**
+	* Adds otherEntry and all the entries otherEntry tied with to this entry's ties array
+	* return {number} The number of entries that are in this entry's ties array now
+	* @function
+	*/
 	tie(otherEntry){
 		this.ties.push(otherEntry);
 		this.ties = this.ties.concat(otherEntry.ties);
+		return this.ties.length;
 	}
 
 }
