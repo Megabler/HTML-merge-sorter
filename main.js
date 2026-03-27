@@ -381,10 +381,10 @@ function createTable(numImages){
 	
 	let ranking = 1;
 	for (let counter = 0; counter < arr.length; counter++) {
-		insertRowFunc(ranking, arr[counter], tbl, counter < numImages);
+		insertRowFunc(ranking, arr[counter], tbl, ranking <= numImages);
 		// Add the elements that tied with the current element and give them the same rank
 		for(const tieEntry of arr[counter].ties){
-			insertRowFunc(ranking, tieEntry, tbl, counter < numImages);
+			insertRowFunc(ranking, tieEntry, tbl, ranking <= numImages);
 		}
 		ranking += arr[counter].ties.length + 1; // Update ranks. If there are e.g. 2 first places (i.e. arr[1].tie.length == 1), then there is no second place, and the next best is third place
 	}
