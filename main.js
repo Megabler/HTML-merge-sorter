@@ -345,6 +345,7 @@ function setNumRounds(){
 */
 function updateRoundPercent() {
 	const percent = Math.floor((numExaminedCharacters / numTotalCharacters) * 1000) / 10;
+	console.log("numExaminedCharacters: " + numExaminedCharacters); 
 	document.getElementById("roundPercent").innerHTML = percent;
 }
 
