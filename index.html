@@ -265,10 +265,13 @@
 
 		<span id=middle class="middle">
 			<h2 id="Round" style="text-align:center">
-				<span id="counter">1</span> / <span id="numRounds">?</span>
+				Round <span id="roundCounter">1</span> / <span id="numRounds">?</span>
+			</h2>
+			<h2 id="Round" style="text-align:center">
+				<span id="roundPercent">0</span>%
 			</h2>
 			<button id="tieButton" type="button">Tie</button>
-			<button id="copiumButton" type="button" style="margin-top:40%">Undo</button>
+			<button id="undoButton" type="button" style="margin-top:40%">Undo</button>
 		</span>
 
 		<span id=right class="right">
@@ -314,6 +317,8 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 
 <script src="baseArrays.js"></script> 
 <script src="tooltip.js"></script> 
+<script src="resultsRepresentation.js"></script> 
+<script src="sortingLogic.js"></script> 
 <script src="main.js"></script>
 
 <!-- taken from https://stackoverflow.com/questions/53757970/downloading-data-tables-from-html-as-image  and  https://stackoverflow.com/questions/30372417/html2canvas-not-rendering-image-externally-hosted-images -->
