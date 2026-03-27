@@ -49,6 +49,7 @@ function createTable(numImages){
 		for(const tieEntry of arr[counter].ties){
 			insertRowFunc(ranking, tieEntry, tbl, ranking <= numImages);
 		}
+		console.log(arr[counter].name, ranking, numImages, ranking <= numImages);
 		ranking += arr[counter].ties.length + 1; // Update ranks. If there are e.g. 2 first places (i.e. arr[1].tie.length == 1), then there is no second place, and the next best is third place
 	}
 }
