@@ -8,7 +8,7 @@ function showResults(){
 	console.log("Change table");
 	
 	document.getElementById("startFrame").style.display = 'none';
-	document.getElementById("frame").style.display = 'none';
+	document.getElementById("mainFrame").style.display = 'none';
 	document.getElementById("tableFrame").style.display = '';
 	
 	let numImages = document.getElementById("imgNumbers").value;

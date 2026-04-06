@@ -446,6 +446,7 @@ class Entry {
 		this.rarity = rarity;
 		this.imageSrc = imageSrc;
 		this.ties = [];
+		this.recentTies = []; // Ties that were added last. Needed to undo a tie
 		//console.log("Created entry for " + name);
 	}
 	
@@ -455,9 +456,18 @@ class Entry {
 	* @function
 	*/
 	tie(otherEntry){
-		this.ties.push(otherEntry);
-		this.ties = this.ties.concat(otherEntry.ties);
-		return this.ties.length;
+		this.flattenTies();
+		otherEntry.flattenTies();
+		this.recentTies = [otherEntry];
+		this.recentTies = this.recentTies.concat(otherEntry.ties);
+		return this.ties.length + this.recentTies.length;
+	}
+	
+	/**
+	* Adds recentTies to ties to create a single array of ties
+	*/
+	flattenTies(){
+		this.ties = this.ties.concat(this.recentTies);
 	}
 
 }

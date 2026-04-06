@@ -44,12 +44,11 @@ function selectContentLeft(selected){
 	leftIntern++;
 	numExaminedCharacters++;
 		
-	let newContent;
 	if(arr[left].length === leftIntern){
 		finishRight();
 		finishSubarray();
 	} else {
-		newContent = arr[left][leftIntern];
+		let newContent = arr[left][leftIntern];
 		update(selected, newContent);
 	}
 }
@@ -65,12 +64,11 @@ function selectContentRight(selected){
 	rightIntern++;
 	numExaminedCharacters++;
 		
-	let newContent;
 	if(arr[right].length === rightIntern){
 		finishLeft();
 		finishSubarray();
 	} else {
-		newContent = arr[right][rightIntern];
+		let newContent = arr[right][rightIntern];
 		update(selected, newContent);
 	}
 }
@@ -80,10 +78,12 @@ function selectContentRight(selected){
 * @function
 */
 function initializeFirstOptions(){
+	if (debug) {console.log("Start initialization");}
 	update(document.getElementById("left"), arr[0][0]);
 	update(document.getElementById("right"), arr[1][0]);
 	
-	document.getElementById("frame").style.display = '';
+	document.getElementById("mainFrame").style.display = '';
+	if (debug) {console.log(arr);}
 }
 
 /**
@@ -121,17 +121,17 @@ function finishSubarray(){
 	}
 	
 	// Update left frame and pointers
-	newContent = arr[next][0];
+	left = next;
+	let newContent = arr[left][0];
 	update(document.getElementById("left"), newContent); 
 	leftIntern = 0;
-	left = next;
 	next++;
 	
 	// Update right frame and pointers
-	newContent = arr[next][0];
+	right = next;
+	newContent = arr[right][0];
 	update(document.getElementById("right"), newContent); 
 	rightIntern = 0;
-	right = next;
 	next++;
 }
 
@@ -186,10 +186,14 @@ function finishIteration(){
 		
 		// Flatten array 
 		arr = arr[0];
+		
+		// Flatten ties
+		for(const entry of arr){
+			entry.flattenTies();
+		}
 		console.log("Final sorting: ")
 		console.log(arr);
 		
-		document.getElementById("Main").style.display = 'none';
 		showResults();
 	}
 }
@@ -209,14 +213,14 @@ function tie(event){
 	leftIntern++;
 	curSubarray.push(leftEntry);
 	
-	// If one internal pointer is out of bounds, we add the remaining elements of the other pointer and then advance the outer pointers left and right
 	if(arr[right].length === rightIntern || arr[left].length === leftIntern){
+		// If one internal pointer is out of bounds, we add the remaining elements of the other pointer and then advance the outer pointers left and right
 		// Calling finishLeft (finishRight) if leftIntern (rightIntern) is out of bounds does nothing. So we call both to not have two cases between which pointer is out of bounds
-		finishLeft()
-		finishRight()
+		finishLeft();
+		finishRight();
 		finishSubarray();
 	} else {
-		newContent = arr[right][rightIntern];
+		let newContent = arr[right][rightIntern];
 		update(document.getElementById('right'), newContent);
 		newContent = arr[left][leftIntern];
 		update(document.getElementById('left'), newContent);

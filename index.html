@@ -12,23 +12,24 @@
 <!-- The start frame where the user defines some options-->
 <div id="startFrame" style="text-align: center;">
             
-	<button id="startButton" type="button" style="margin-top: 2%; margin-bottom: 5%;" onclick="start()">Start!</button>
+	<button id="startButton" type="button" style="margin-top: 2%; margin-bottom: 5%;" onclick="startSorting()">Start Sorting!</button>
 	
-	<form id="gameRadio" onclick="changeSelectorDisplayed(event)">
-		<input type="radio" id="genshinRadio" name="game" value="genshin" checked="checked">
-		<label for="genshinRadio">Genshin</label> 
+	<form id="gameSelection" onclick="changeSelectorDisplayed(event)">
+		<!--<input type="checkbox" id="allCheckbox" name="game" value="all">
+		<label for="allCheckbox">All</label> 
+		All option for 4 games is not needed and overly complicated-->
 		
-		<input type="radio" id="hsrRadio" name="game" value="hsr">
-		<label for="hsrRadio">HSR</label> 
+		<input type="checkbox" id="genshinCheckbox" name="game" value="genshin" checked="checked">
+		<label for="genshinCheckbox">Genshin</label> 
 		
-		<input type="radio" id="zzzRadio" name="game" value="zzz">
-		<label for="zzzRadio">ZZZ</label>
+		<input type="checkbox" id="hsrCheckbox" name="game" value="hsr">
+		<label for="hsrCheckbox">HSR</label> 
 		
-		<input type="radio" id="wuwaRadio" name="game" value="wuwa">
-		<label for="wuwaRadio">WuWa</label>
+		<input type="checkbox" id="zzzCheckbox" name="game" value="zzz">
+		<label for="zzzCheckbox">ZZZ</label>
 		
-		<input type="radio" id="allRadio" name="game" value="all">
-		<label for="allRadio">All</label>
+		<input type="checkbox" id="wuwaCheckbox" name="game" value="wuwa">
+		<label for="wuwaCheckbox">WuWa</label>
 	</form>
 	
 	
@@ -255,7 +256,7 @@
 </div>
 
 <!-- The Main frame where the user chooses between characters-->
-<div id="frame" style="display:none">
+<div id="mainFrame" style="display:none">
 
 	<div id="Main" >
 		<span id="left" class="left">
@@ -284,7 +285,7 @@
 
 <!-- The table frame that shows the result-->
 <div id="tableFrame" style="display:none">
-	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" onclick="notSupported(event)" >Return!</button>
+	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" onclick="returnToStartFrame(event)" >Return!</button>
 	
 	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" onclick="convertToImage(event)" >Download Table</button>
 	
