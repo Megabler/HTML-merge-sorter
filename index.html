@@ -38,7 +38,7 @@
 		<input type="checkbox" id="raritySelector" name="raritySelector" value="1" checked="checked">
 		<label for="raritySelector">Include 4* characters?</label> 
 		
-		<span id="copiumSelectorSpan"  data-tooltip="Select to include characters that likely won't be playable. Filtering does not apply to these characters.">
+		<span id="copiumSelectorSpan"  data-tooltip="Select to include characters that likely won't be playable. Element and weapon filtering does not apply to these characters.">
 			<input type="checkbox" id="copiumSelector" name="copiumSelector" value="1">
 			<label for="copiumSelector">Copium?</label>
 		</span>
@@ -285,9 +285,9 @@
 
 <!-- The table frame that shows the result-->
 <div id="tableFrame" style="display:none">
-	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" onclick="returnToStartFrame(event)" >Return!</button>
+	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" data-tooltip="Return to starting site to start sorting again." onclick="returnToStartFrame(event)" >Return!</button>
 	
-	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" onclick="convertToImage(event)" >Download Table</button>
+	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" data-tooltip="Create a downloadable image of the result table." onclick="convertToImage(event)" >Download Table</button>
 	
     <div id="tableImageLink" class="tableButton" style="top: 250px">
        <!-- Result will appear be here -->

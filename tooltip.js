@@ -15,6 +15,32 @@ document.getElementById('copiumSelectorSpan').addEventListener('mouseover', func
   tooltip = showTooltip(anchorElem, anchorElem.dataset.tooltip);
 });
 
+document.getElementById('tableToImageButton').addEventListener('mouseover', function(event) {
+  // important: a fast-moving mouse may "jump" right to a child on an annotated node, skipping the parent
+  // so mouseover may happen on a child.
+
+  let anchorElem = event.target.closest('button');
+  //console.log(anchorElem.id);
+
+  if (!anchorElem) return;
+
+  // show tooltip and remember it
+  tooltip = showTooltip(anchorElem, anchorElem.dataset.tooltip);
+});
+
+document.getElementById('backButton').addEventListener('mouseover', function(event) {
+  // important: a fast-moving mouse may "jump" right to a child on an annotated node, skipping the parent
+  // so mouseover may happen on a child.
+
+  let anchorElem = event.target.closest('button');
+  //console.log(anchorElem.id);
+
+  if (!anchorElem) return;
+
+  // show tooltip and remember it
+  tooltip = showTooltip(anchorElem, anchorElem.dataset.tooltip);
+});
+
 /*
 document.getElementById('genshinWeapons').addEventListener('mouseover', function(event) {
   // important: a fast-moving mouse may "jump" right to a child on an annotated node, skipping the parent
