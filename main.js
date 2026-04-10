@@ -1,6 +1,6 @@
 //createWeaponSelections();
 //document.getElementById("startButton").addEventListener("click", start);
-let debug = true;
+let debug = false;
 
 /**
 * The array that contains the last complete result. In the first round it contains
@@ -22,10 +22,7 @@ let numTotalCharacters = arr.length;
 /**
 * Three pointers to elements in arr. left and right point to the element currently
 * shown in the left and right selection frame, respectively.
-* next is the index to which the pointers will advance to, which is max{left,right}+1.
-* For example (in round one), left=0 showing Yixuan, and right=3 showing Anby, and next=4.
-* If the user clicks on the left, left is set to next(=4), next to 5, and Yixuan will 
-* be replaced to show the entry arr[4].
+* next is the index to which the pointers will advance to.
 * In further rounds, the internal pointer are necessary, since arr[left] can be an 
 * array of entries. Thus, left will only be increased if all entries in arr[left] were 
 * examined, i.e. if leftIntern===arr[left].length.
@@ -38,6 +35,9 @@ let next = 2;
 let rightIntern = 0;
 let leftIntern = 0;
 
+// Contains past states in order to return to them, thus undoing actions
+let pastStatesQueue = [];
+
 let finishVar = false;
 
 /**
@@ -49,10 +49,6 @@ let runningArray = [];
 * When left/right increases, curSubarray is pushed to runningArray and then emptied.
 */
 let curSubarray = [];
-
-// Needed for undo to differentiate between ties and single selection.
-let lastSortingAction = '';
-let lastSorted; // Left or right
 
 window.onload = function(){
 	// Show the selections based on the gameSelection form
@@ -103,7 +99,7 @@ function startSorting(){
 	arr = [];
 	for (i = 0; i < gameSelector.length; i++) {
 		if (gameSelector[i].checked){
-			console.log("Selected " + gameSelector[i].id);
+			if(debug) {console.log("Selected " + gameSelector[i].id);}
 			switch(gameSelector[i].id) {
 			  case "allCheckbox":
 				arr = initalizeArrayWithZZZ();
@@ -174,7 +170,7 @@ function changeSelector(event){
 		if(event.target.value.includes("All")){
 			// Check or uncheck all other options
 			let children = event.target.closest('form').children;
-			console.log("All selector value: " + event.target.value);
+			if (debug) {console.log("All selector value: " + event.target.value);}
 			for (let i = 0; i < children.length; i++) {
 				// Set the other input elements to the same value as the "All" input element
 				children[i].checked = event.target.checked;
@@ -208,8 +204,10 @@ function changeSelector(event){
 * @function
 */
 function changeSelectorDisplayed(event){
-	console.log("event.target");
-	console.log(event.target);
+	if(debug){
+		console.log("event.target");
+		console.log(event.target);
+	}
 	if(event.target.tagName.toLowerCase() === 'input'){
 		if(event.target.checked){
 			showGameOptions(event.target.value);
@@ -251,10 +249,13 @@ function resetValues(){
 	right = 1;
 	rightIntern = 0;
 	finishVar = false;
+	
+	pastStatesQueue = [];
 
 	runningArray = [];
 	curSubarray = [];
 	document.getElementById("roundCounter").innerHTML = +1;
+	
 }
 
 //------ no longer used since the HTML form for weapon selection was manually written

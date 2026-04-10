@@ -10,13 +10,23 @@ function activateSelection(){
 		return;
 	}
 	const selected = event.target.closest('span');
-	console.log("Next: " + next);
-	console.log(arr);
+	if(debug) {
+		console.log("Next: " + next);
+		console.log(arr);
+		console.log(runningArray);
+		console.log(curSubarray);
+	}
 	
 	if(selected.classList.contains("left")){
+		pastStatesQueue.push(new State(
+			left, leftIntern, right, rightIntern, next, "left"
+		));
 		highlightOption(selected);
 		selectContentLeft(selected);
 	} else if(selected.classList.contains("right")) {
+		pastStatesQueue.push(new State(
+			left, leftIntern, right, rightIntern, next, "right"
+		));
 		highlightOption(selected);
 		selectContentRight(selected);
 	} else {
@@ -24,11 +34,18 @@ function activateSelection(){
 		highlightOption(selectedElement);
 		
 		if(selectedElement.id === "tieButton"){
+			pastStatesQueue.push(new State(
+				left, leftIntern, right, rightIntern, next, "tie"
+			));
 			tie(event);
 		} else if(selectedElement.id === "undoButton"){
-			// TODO undo buttons
-			notSupported(event);
+			undoSortingAction(event);
 		}
+	}
+	if(debug) {
+		console.log("After execution");
+		console.log(runningArray);
+		console.log(curSubarray);
 	}
 	
 	updateRoundPercent();
@@ -94,7 +111,7 @@ function initializeFirstOptions(){
 */
 function update(optionFrame, newContent){
 	// Changes the content of the optionFrame element
-	//console.log("Load " + newContent);
+	if (debug) {console.log("Load " + newContent);}
 	optionFrame.getElementsByTagName('div')[0].innerHTML = newContent.name;
 	optionFrame.getElementsByTagName('img')[0].src = newContent.imageSrc;
 	optionFrame.getElementsByTagName('img')[0].alt = newContent.name;
@@ -107,16 +124,19 @@ function update(optionFrame, newContent){
 */
 function finishSubarray(){		
 	runningArray.push(curSubarray);
-	if(debug){
-		console.log("Adding to new array: " + curSubarray.toString());
-		console.log("size of new array: " + runningArray.length);
-	}
 	curSubarray = [];
+	if(debug){
+		console.log("Adding to running array: " + curSubarray.toString());
+		console.log(runningArray);
+		console.log(runningArray[runningArray.length - 1]);
+		console.log(curSubarray);
+		console.log("size of running array: " + runningArray.length);
+	}
 	
-	// Check if an iteration is finished, if all elements (except one for odd amount of elements) were examined
+	// Check if a round is finished, i.e. if all elements (except one for odd amount of elements) were examined
 	if(next === arr.length || next + 1 === arr.length){
-		console.log("Iteration finished");
-		finishIteration();
+		console.log("Round finished");
+		finishRound();
 		if(finishVar) return;
 	}
 	
@@ -163,10 +183,10 @@ function finishLeft(){
 
 /**
 * Reset pointers and arrays. Potentially stop further selection if finished, i.e. if we obtained a clear ranking
-* Should only be called if all options (except ties or potentially the last element for odd lengths) were examined in the current iteration.
+* Should only be called if all options (except ties or potentially the last element for odd lengths) were examined in the current round.
 * @function
 */
-function finishIteration(){
+function finishRound(){
 	console.log("All elements inspected");
 	document.getElementById("roundCounter").innerHTML = +document.getElementById("roundCounter").innerHTML + 1;
 	if(arr.length % 2 === 1){
@@ -178,6 +198,7 @@ function finishIteration(){
 	runningArray = [];
 	numExaminedCharacters = 0;
 	console.log("New array: " + arr.toString());
+	pastStatesQueue = [];
 	next = 0;
 	if(arr.length === 1){
 		// Everything was sorted, so we move on to showing results
@@ -234,4 +255,85 @@ function tie(event){
 function updateRoundPercent() {
 	const percent = Math.floor((numExaminedCharacters / numTotalCharacters) * 1000) / 10;
 	document.getElementById("roundPercent").innerHTML = percent;
+}
+
+function undoSortingAction(event) {
+	if (debug){
+		console.log("Start of undo:")
+		console.log(arr);
+		console.log(runningArray);
+		console.log(curSubarray);
+	}
+	if(pastStatesQueue.length === 0){
+		alert("Undo not possible at beginning of rounds.");
+		return;
+	}
+	let lastState = pastStatesQueue.pop();
+	
+	// Reset variables to previous state
+	left = lastState.left;
+	leftIntern = lastState.leftIntern;
+	right = lastState.right;
+	rightIntern = lastState.rightIntern;
+	next = lastState.next;
+	
+	let entriesUndone = 0;
+	
+	// Remove added tie elements if last action was a tie
+	if(lastState.choice === "tie") {
+		entriesUndone+=arr[left][leftIntern].recentTies.length;
+		arr[left][leftIntern].recentTies = [];
+	}
+	
+	// Remove entries added in the last action to curSubarray or runningArray
+	if(curSubarray.length === 0){
+		// curSubarray is empty, so the last action actually pushed curSubarray to runningArray and then reset curSubarray
+		curSubarray = runningArray.pop();
+	}
+	/** Pop elements from curSubarray until the last picked character is removed, which is the character in arr[right][rightIntern] 
+	* if choice === "right", or arr[left][leftIntern]. Every element removed until then was chosen as "worse" in the last sorting action,
+	* which might change depending on the users new decision.
+	*/
+	let lastPicked;
+	if(lastState.choice === "right"){
+		lastPicked = arr[right][rightIntern].name; // TODO perhaps change to imageSrc, since that is guaranteed unique?
+	} else {
+		lastPicked = arr[left][leftIntern].name; // TODO perhaps change to imageSrc, since that is guaranteed unique?
+	}
+	let lastPopped;
+	while (true) {
+		lastPopped = curSubarray.pop();
+		entriesUndone+=lastPopped.ties.length + lastPopped.recentTies.length + 1;
+		if (debug){
+			console.log("Loop:");
+			console.log(entriesUndone);
+			console.log(lastPopped);
+		}
+		if(lastPicked === lastPopped.name){
+			break;
+		}
+	} 
+	
+	numExaminedCharacters-=entriesUndone;
+	
+	update(document.getElementById("left"), arr[left][leftIntern]);
+	update(document.getElementById("right"), arr[right][rightIntern]);
+}
+
+/**
+* State class that represents a state of variables during sorting
+* @class
+* @classdesc State class that represents a sorting state
+*/
+class State {
+
+	constructor(left, leftIntern, right, rightIntern, next, choice){
+		this.left = left;
+		this.leftIntern = leftIntern;
+		this.right = right;
+		this.rightIntern = rightIntern;
+		this.next = next;
+		this.choice = choice;
+	}
+
 }
