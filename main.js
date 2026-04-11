@@ -56,16 +56,6 @@ window.onload = function(){
 	for (i = 0; i < elementSelector.length; i++) {
 		if (elementSelector[i].checked){
 			switch(elementSelector[i].id) {
-			  case "allCheckbox":
-					document.getElementById("genshinElements").style.display = '';
-					document.getElementById("genshinWeapons").style.display = '';
-					document.getElementById("hsrElements").style.display = '';
-					document.getElementById("hsrWeapons").style.display = '';
-					document.getElementById("zzzElements").style.display = '';
-					document.getElementById("zzzWeapons").style.display = '';
-					document.getElementById("wuwaElements").style.display = '';
-					document.getElementById("wuwaWeapons").style.display = '';
-				break;
 			  case "zzzCheckbox":
 					document.getElementById("zzzElements").style.display = '';
 					document.getElementById("zzzWeapons").style.display = '';
@@ -101,13 +91,6 @@ function startSorting(){
 		if (gameSelector[i].checked){
 			if(debug) {console.log("Selected " + gameSelector[i].id);}
 			switch(gameSelector[i].id) {
-			  case "allCheckbox":
-				arr = initalizeArrayWithZZZ();
-				arr = arr.concat(initalizeArrayWithHSR());
-				arr = arr.concat(initalizeArrayWithWuWa());
-				arr = arr.concat(initalizeArrayWithGenshin());
-				console.log(arr);
-				break;
 			  case "zzzCheckbox":
 				arr = arr.concat(initalizeArrayWithZZZ());
 				break;
