@@ -452,7 +452,7 @@ class Entry {
 	
 	/**
 	* Adds otherEntry and all the entries otherEntry tied with to this entry's ties array
-	* return {number} The number of entries that are in this entry's ties array now
+	* return {number} The number of entries that are tied with this entry, i.e. those contained in its ties or recentTies arrays
 	* @function
 	*/
 	tie(otherEntry){
@@ -468,6 +468,7 @@ class Entry {
 	*/
 	flattenTies(){
 		this.ties = this.ties.concat(this.recentTies);
+		this.recentTies = [];
 	}
 
 }

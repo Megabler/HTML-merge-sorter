@@ -46,6 +46,7 @@ function activateSelection(){
 		console.log("After execution");
 		console.log(runningArray);
 		console.log(curSubarray);
+		console.log(numExaminedCharacters);
 	}
 	
 	updateRoundPercent();
@@ -58,8 +59,9 @@ function activateSelection(){
 */
 function selectContentLeft(selected){
 	curSubarray.push(arr[left][leftIntern]);
+	// The chosen characters and all characters that tied with it were handled
+	numExaminedCharacters+=arr[left][leftIntern].ties.length + 1;
 	leftIntern++;
-	numExaminedCharacters++;
 		
 	if(arr[left].length === leftIntern){
 		finishRight();
@@ -78,8 +80,9 @@ function selectContentLeft(selected){
 function selectContentRight(selected){
 	// Add new preferred element to current subarray
 	curSubarray.push(arr[right][rightIntern]);
+	// The chosen characters and all characters that tied with it were handled
+	numExaminedCharacters+=arr[right][rightIntern].ties.length + 1;
 	rightIntern++;
-	numExaminedCharacters++;
 		
 	if(arr[right].length === rightIntern){
 		finishLeft();
@@ -162,8 +165,9 @@ function finishSubarray(){
 function finishRight(){
 	while(rightIntern < arr[right].length){
 		curSubarray.push(arr[right][rightIntern]);
+		// The chosen characters and all characters that tied with it were handled
+		numExaminedCharacters+=arr[right][rightIntern].ties.length + 1;
 		rightIntern++;
-		numExaminedCharacters++;
 	}
 }
 
@@ -175,8 +179,9 @@ function finishLeft(){
 // Add the remaining elements from the left subarray to the current subarray
 	while(leftIntern < arr[left].length){
 		curSubarray.push(arr[left][leftIntern]);
+		// The chosen characters and all characters that tied with it were handled
+		numExaminedCharacters+=arr[left][leftIntern].ties.length + 1;
 		leftIntern++;
-		numExaminedCharacters++;
 	}
 }
 	
@@ -200,6 +205,13 @@ function finishRound(){
 	console.log("New array: " + arr.toString());
 	pastStatesQueue = [];
 	next = 0;
+	
+	// Flatten ties to make sure that recentTies contains only action of the current round (or next round in this case)
+	for(const entryArr of arr){
+		for(const entry of entryArr) {
+			entry.flattenTies();
+		}
+	}
 	if(arr.length === 1){
 		// Everything was sorted, so we move on to showing results
 		finishVar = true;
@@ -208,10 +220,6 @@ function finishRound(){
 		// Flatten array 
 		arr = arr[0];
 		
-		// Flatten ties
-		for(const entry of arr){
-			entry.flattenTies();
-		}
 		console.log("Final sorting: ")
 		console.log(arr);
 		
@@ -229,6 +237,7 @@ function tie(event){
 	const leftEntry = arr[left][leftIntern];
 	const rightEntry = arr[right][rightIntern];
 	
+	// Every character that leftEntry (indirectly) tied with (which includes rightEntry) + leftEntry itself was handled in this action
 	numExaminedCharacters+= leftEntry.tie(rightEntry) + 1;
 	rightIntern++;
 	leftIntern++;
@@ -301,7 +310,7 @@ function undoSortingAction(event) {
 		lastPicked = arr[left][leftIntern].name; // TODO perhaps change to imageSrc, since that is guaranteed unique?
 	}
 	let lastPopped;
-	while (true) {
+	do {
 		lastPopped = curSubarray.pop();
 		entriesUndone+=lastPopped.ties.length + lastPopped.recentTies.length + 1;
 		if (debug){
@@ -309,10 +318,7 @@ function undoSortingAction(event) {
 			console.log(entriesUndone);
 			console.log(lastPopped);
 		}
-		if(lastPicked === lastPopped.name){
-			break;
-		}
-	} 
+	} while (lastPicked !== lastPopped.name);
 	
 	numExaminedCharacters-=entriesUndone;
 	
