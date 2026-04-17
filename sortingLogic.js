@@ -274,7 +274,7 @@ function tie(event){
 */
 function updateRoundPercent() {
 	const percent = Math.floor((numExaminedCharacters / numTotalCharacters) * 1000) / 10;
-	document.getElementById("roundPercent").innerHTML = percent;
+	document.getElementById("roundPercent").innerHTML = percent.toFixed(1);
 }
 
 function undoSortingAction(event) {
