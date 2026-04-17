@@ -133,10 +133,10 @@ function initalizeArrayWithGenshin(){
 	
 	// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
 	if(document.getElementById("copiumSelector").checked) {
-		newArr.push([new Entry("Capitano", "five", "copium/capitano.jpg")]);
-		newArr.push([new Entry("Kitsune Saiguu", "five", "")]);
-		newArr.push([new Entry("Signora", "five", "")]);
-		newArr.push([new Entry("Rerir", "five", "")]);
+		newArr.push([new Entry("Capitano", "five", "images/copium/capitano.jpg")]);
+		newArr.push([new Entry("Kitsune Saiguu", "five", "images/copium/saiguu.jpg")]);
+		newArr.push([new Entry("Signora", "five", "images/copium/signora.jpg")]);
+		newArr.push([new Entry("Rerir", "five", "images/copium/rerir.jpg")]);
 	}
 	
 	console.log("Loaded array: " + newArr);
@@ -241,9 +241,9 @@ function initalizeArrayWithHSR(){
 	
 	// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
 	if(document.getElementById("copiumSelector").checked) {
-		newArr.push([new Entry("Smolrene", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
-		newArr.push([new Entry("Cocolia", "five", "")]);
-		newArr.push([new Entry("Tribios", "five", "")]);
+		newArr.push([new Entry("Smolrene", "five", "images/copium/smolrene.jpg")]);
+		newArr.push([new Entry("Cocolia", "five", "images/copium/cocolia.jpg")]);
+		newArr.push([new Entry("Tribios", "five", "images/copium/tribios.jpg")]);
 	}
 	
 	console.log("Loaded array: " + newArr);
@@ -319,10 +319,10 @@ function initalizeArrayWithZZZ(){
 	
 	// Copium options (i.e. Characters that likely won't be playable or at least are not so far)
 	if(document.getElementById("copiumSelector").checked) {
-		newArr.push([new Entry("Isolde", "five", "")]);
-		newArr.push([new Entry("Sarah", "five", "")]);
-		newArr.push([new Entry("Ye Shiyuan", "five", "")]);
-		newArr.push([new Entry("Pompey", "five", "")]);
+		newArr.push([new Entry("Isolde", "five", "images/copium/isolde.jpg")]);
+		newArr.push([new Entry("Sarah", "five", "images/copium/sarah.jpg")]);
+		newArr.push([new Entry("Ye Shiyuan", "five", "images/copium/shiyuan.jpg")]);
+		newArr.push([new Entry("Pompey", "five", "images/copium/pompey.jpg")]);
 	}
 	
 	console.log("Loaded array: " + newArr + "; Length: " + newArr.length);
@@ -426,8 +426,7 @@ function testInit(){
 	}
 	
 	if(document.getElementById("copiumSelector").checked) {
-		newArr.push([new Entry("Smolrene", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
-		newArr.push([new Entry("Cocolia", "five", "https://honkai-star-rail.fandom.com/wiki/Cyrene/Media?file=Sticker_PPG_24_Cyrene_05.png")]);
+		newArr.push([new Entry("Smolrene", "five", "images/copium/smolrene.jpg")]);
 	}
 	
 	console.log("Loaded array: " + newArr);
