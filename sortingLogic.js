@@ -31,15 +31,16 @@ function activateSelection(){
 		selectContentRight(selected);
 	} else {
 		const selectedElement = event.target;
-		highlightOption(selectedElement);
 		
 		if(selectedElement.id === "tieButton"){
+			highlightOption(selectedElement);
 			pastStatesQueue.push(new State(
 				left, leftIntern, right, rightIntern, next, "tie"
 			));
 			tie(event);
 		} else if(selectedElement.id === "undoButton"){
 			undoSortingAction(event);
+			highlightOption(selectedElement);
 		}
 	}
 	if(debug) {
@@ -47,6 +48,11 @@ function activateSelection(){
 		console.log(runningArray);
 		console.log(curSubarray);
 		console.log(numExaminedCharacters);
+	}
+	
+	// Mark undo button as selectable
+	if(pastStatesQueue.length > 0){
+		document.getElementById("undoButton").classList.remove('unselectable');
 	}
 	
 	updateRoundPercent();
@@ -206,6 +212,11 @@ function finishRound(){
 	pastStatesQueue = [];
 	next = 0;
 	
+	// Mark undo button as unselectable
+	if(pastStatesQueue.length === 0) {
+		document.getElementById("undoButton").classList.add('unselectable');
+	}
+	
 	// Flatten ties to make sure that recentTies contains only action of the current round (or next round in this case)
 	for(const entryArr of arr){
 		for(const entry of entryArr) {
@@ -278,6 +289,11 @@ function undoSortingAction(event) {
 		return;
 	}
 	let lastState = pastStatesQueue.pop();
+	
+	// Mark undo button as unselectable
+	if(pastStatesQueue.length === 0) {
+		document.getElementById("undoButton").classList.add('unselectable');
+	}
 	
 	// Reset variables to previous state
 	left = lastState.left;

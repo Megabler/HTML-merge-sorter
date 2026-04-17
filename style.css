@@ -114,6 +114,12 @@ button {
 	background-color: lightblue;
 }
 
+
+.unselectable{
+	background: rgb(24,24,24);
+	color: gray;
+}
+
 table {
   margin: auto;
   width: 30%;
