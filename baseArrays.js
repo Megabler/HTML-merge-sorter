@@ -13,6 +13,8 @@ function initalizeArrayWithGenshin(){
 	const include4Stars = document.getElementById("raritySelector").checked;
 	
 	const inter = [
+		["Linnea", "five", "Linnea", "Geo", "BOW"],
+		["Varka", "five", "Varka", "Anemo", "CLAYMORE"],
 		["Illuga", "four", "Illuga", "Geo", "POLE"],
 		["Zibai", "five", "Zibai", "Geo", "SWORD_ONE_HAND"],
 		["Columbina", "five", "Columbina", "Hydro", "CATALYST"],
@@ -153,6 +155,12 @@ function initalizeArrayWithHSR(){
 	const include4Stars = document.getElementById("raritySelector").checked;
 	
 	const inter = [
+		["Mortenax Blade", "five", "Mortenax Blade", "fire", "Warlock"],
+		["Evanescia", "five", "Evanescia", "physical", "Elation"],
+		["Silverwolf_999", "five", "Silverwolf 999", "imaginary", "Elation"],
+		["Ashveil", "five", "Ashveil", "thunder", "Rogue"],
+		["Sparxie", "five", "Sparxie", "fire", "Elation"],
+		["Yao Guang", "five", "Yao Guang", "physical", "Elation"],
 		["1321", "five", "The Dahlia", "fire", "Warlock"],
 		["1415", "five", "Cyrene", "ice", "Memory"],
 		["1412", "five", "Cerydra", "wind", "Shaman"],
@@ -306,7 +314,13 @@ function initalizeArrayWithZZZ(){
 		["53", "five", "Banyue", "Rupture" ,"Fire"],
 		["54", "five", "Dialyn", "Stun" ,"Physical"], 
 		["55", "five", "Ye Shuanguang", "AttackType" ,"HonedEdge"], 
-		["56", "five", "Zhao", "Defense" ,"Ice"], 
+		["56", "five", "Zhao", "Defense" ,"Ice"],  
+		["57", "five", "Sunna", "Support" ,"Physical"], 
+		["58", "five", "Aria", "Anomaly" ,"Ether"], 
+		["59", "five", "Nangong Yu", "Stun" ,"Ether"], 
+		["60", "five", "Cissia", "AttackType" ,"Electric"], 
+		["61", "five", "Promeia", "Anomaly" ,"Ice"], 
+		["62", "five", "Starlight - Billy", "Rupture" ,"Physical"], 
 	];
 	for(const entry of inter){
 		entry[4] = specialTerm(entry[4]);
@@ -363,14 +377,14 @@ function initalizeArrayWithWuWa(){
 		["12", "four", "Aalto", "Gun", "Wind"],
 		["11", "five", "Jiyan", "Sword", "Wind"],
 		["23", "five", "Jianxin", "Fist", "Wind"],
-		["4", "five", "Rover: Aero", "Knife", "Wind"],
+		//["4", "five", "Rover: Aero", "Knife", "Wind"],
 		["37", "five", "Ciaccona", "Gun", "Wind"],
-		["5", "five", "Rover: Aero", "Knife", "Wind"],
+		//["5", "five", "Rover: Aero", "Knife", "Wind"],
 		["40", "five", "Cartethyia", "Knife", "Wind"],
 		["48", "five", "Iuno", "Fist", "Wind"],
 		["56", "five", "Qiuyuan", "Knife", "Wind"],
-		["4", "five", "Rover: Spectro", "Knife", "Light"],
-		["5", "five", "Rover: Spectro", "Knife", "Light"],
+		//["4", "five", "Rover: Spectro", "Knife", "Light"],
+		//["5", "five", "Rover: Spectro", "Knife", "Light"],
 		["3", "five", "Verina", "Magic", "Light"],
 		["30", "four", "Lumi", "Sword", "Thunder"],
 		["28", "five", "Shorekeeper", "Magic", "Light"],
@@ -380,11 +394,17 @@ function initalizeArrayWithWuWa(){
 		["9", "four", "Taoqi", "Sword", "Dark"],
 		["10", "four", "Danjin", "Knife", "Dark"],
 		["29", "five", "Camellya", "Knife", "Dark"],
-		["5", "five", "Rover: Havoc", "Knife", "Dark"],
-		["4", "five", "Rover: Havoc", "Knife", "Dark"],
+		//["5", "five", "Rover: Havoc", "Knife", "Dark"],
+		//["4", "five", "Rover: Havoc", "Knife", "Dark"],
 		["33", "five", "Roccia", "Fist", "Dark"],
 		["34", "five", "Cantarella", "Magic", "Dark"],
-		["41", "five", "Phrolova", "Magic", "Dark"]
+		["41", "five", "Phrolova", "Magic", "Dark"],
+		["Lynae", "five", "Lynae", "Gun", "Light"],
+		["Mornye", "five", "Mornye", "Sword", "Fire"],
+		["Aemeath", "five", "Aemeath", "Knife", "Fire"],
+		["Luuk", "five", "Luuk", "Fist", "Light"],
+		["Sigrika", "five", "Sigrika", "Fist", "Wind"],
+		["Hiyuki", "five", "Hiyuki", "Knife", "Ice"],
 	];
 	for(const entry of inter){
 		const elementId = "wuwa" + capitalizeFirstLetter(entry[4]);
