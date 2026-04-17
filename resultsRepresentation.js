@@ -16,7 +16,7 @@ function showResults(){
 	if(numImages === "none"){
 		numImages = 0;
 	} else if(numImages === "all"){
-		numImages = arr.length;
+		numImages = numTotalCharacters;
 	} else {
 		numImages = +numImages;
 	}
