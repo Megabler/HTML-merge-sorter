@@ -127,7 +127,7 @@ function initalizeArrayWithGenshin(){
 		const elementId = "genshin" + capitalizeFirstLetter(entry[3]);
 		const weaponId = "genshin" + entry[4] + "Weapons";
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "images/genshin/chars/UI_AvatarIcon_" + entry[0] + ".webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/genshin/chars/" + entry[0] + ".webp")]);
 		}
 	}
 	
@@ -313,7 +313,7 @@ function initalizeArrayWithZZZ(){
 		const elementId = "zzz" + capitalizeFirstLetter(entry[4]);
 		const weaponId = "zzz" + capitalizeFirstLetter(entry[3]) + "Weapons";
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "images/zzz/chars/IconRoleCrop" + entry[0] + ".webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/zzz/chars/" + entry[0] + ".webp")]);
 		}
 	}
 	
@@ -391,7 +391,7 @@ function initalizeArrayWithWuWa(){
 		const weaponId = "wuwa" + capitalizeFirstLetter(entry[3]) + "Weapons";
 		console.log(weaponId);
 		if( (include4Stars || entry[1] === "five") && document.getElementById(elementId).checked && document.getElementById(weaponId).checked){ 
-			newArr.push([new Entry(entry[2], entry[1], "images/wuwa/chars/T_IconRoleHead256_" + entry[0] + "_UI.webp")]);
+			newArr.push([new Entry(entry[2], entry[1], "images/wuwa/chars/" + entry[0] + "_UI.webp")]);
 		}
 	}
 	
