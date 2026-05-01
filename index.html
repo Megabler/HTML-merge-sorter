@@ -5,9 +5,10 @@
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="wrapper"> <!-- wrapper -->
 <h1 style="text-align: center;padding-bottom: 3%"> Gacha Character Sorter </h1>
 
-<div> <!-- div that contains everything except the heading and the credits -->
+<main class="page-body"> <!-- main that contains everything except the heading and the credits -->
 
 <!-- The start frame where the user defines some options-->
 <div id="startFrame" style="text-align: center;">
@@ -291,13 +292,12 @@
 	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" data-tooltip="Return to starting site to start sorting again." onclick="returnToStartFrame(event)" >Return!</button>
 	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" data-tooltip="Create a downloadable image of the result table." onclick="convertToImage(event)" >Download table!</button>
 	
-	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" data-tooltip="Create a downloadable image of the result table." onclick="convertToImage(event)" >Download Table</button>
-	
+	<h1 style="text-align: center;font-family: Garamond, serif;"> Results </h1>
     <div id="tableImageLink" class="tableButton" style="top: 250px">
        <!-- Result will be added her through resultsRepresentation.js here -->
 	</div>
 	
-	<form id="imageNumberSelector">
+	<form id="imageNumberSelector" style="padding-left: 20px;">
 	<label for="imgNumbers">Number of images:</label>
 		<select id="imgNumbers" name="imgNumbers" onchange="showResults()">
 			<option value="none">None</option>
@@ -315,12 +315,20 @@
 	</table>
 	
 </div>
-</div> <!-- div that contains everything except the heading and the credits -->
+</main> <!-- main that contains everything except the heading and the credits -->
 
-<div style="position: absolute; bottom: 5px; left: 20%;transform: translate(-50%, -50%);">
+
+<br>
+<!--
+<div style="position: fixed; bottom: 5px; left: 50%;transform: translate(-50%, -50%); margin-top:5%;">
 Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter</a>.
 </div>
+--> 
+ <footer class="page-footer">
+	Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter</a>.
+ </footer>
 
+</div> <!-- /wrapper -->
 
 <script src="baseArrays.js"></script> 
 <script src="tooltip.js"></script> 

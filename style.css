@@ -16,6 +16,7 @@ button {
     margin: 0 auto;
     display: block;
 	margin-top:5%;
+    font-family: Tahoma, sans-serif;
 	font-size: 40px;
 	color: white;
 	border-radius: 5%;
@@ -38,6 +39,44 @@ button {
   background: #fff;
   box-shadow: 3px 3px 3px rgba(0, 0, 0, .3);
 }
+/* <--Taken from https://developer.mozilla.org/en-US/docs/Web/CSS/How_to/Layout_cookbook/Sticky_footers 
+Footer is not statically at bottom
+.wrapper {
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.page-footer {
+  text-align: center;
+  background-color: rgb(48,48,48);
+  color: white;
+  padding: 20px;
+}
+.page-body {
+  min-height: 100%;
+  padding: 20px;
+}
+*/
+
+/* Taken from https://www.reddit.com/r/Frontend/comments/k1zj0z/how_to_make_footer_stay_at_bottom_of_page_without/ */
+.wrapper {
+    min-height: 100vh;    
+    display: flex;
+    flex-direction: column;
+}
+
+.page-footer {
+  text-align: center;
+  background-color: rgb(48,48,48);
+  color: white;
+  padding: 20px;
+  margin-top: auto;
+}
+
+.page-body {
+  min-height: 100%;
+  padding: 20px;
+}
 
 /**
 * Start frame settings
@@ -48,8 +87,10 @@ button {
   display: block;
   margin: auto;
   width: 100%;
+  height: 250px;
   font-family: Arial, sans-serif;
   margin-top: 4%;
+  margin-bottom: 2%;
 }
 
 /* div that contains all element images for selections */
@@ -99,7 +140,7 @@ button {
 /* Container for the left character option*/
 .left {
   height:100%;
-  border:1px solid black;
+  /* border:1px solid black; */
   float: left;
   width: 40%;
   background: rgb(40,40,40);
