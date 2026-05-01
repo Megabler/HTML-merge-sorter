@@ -1,3 +1,7 @@
+/**
+* General
+*/
+
 html,body{
   margin:0;
   padding:0;
@@ -6,32 +10,8 @@ html,body{
   color: white;
   background: rgb(32,32,32);
   }
-  
-.characterImg {
-  display: block;
-  margin: auto;
-  padding-top: 5%;
-  padding-bottom: 5%;
-  width: 65%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
 
-/* Since html2canvas does not support the object-fit option, and hsr images are not square, we need another option to not distort the image */
-.characterImgTable {
-  display: block;
-  margin: auto;
-  padding-top: 5%;
-  padding-bottom: 5%;
-  width: 65%;
-}
-
-.selectionImage {
-  width: 50px;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
+/* General setting for buttons */
 button {
     margin: 0 auto;
     display: block;
@@ -43,15 +23,7 @@ button {
 	border: 1px solid black;
 }
 
-#Main {
-  display: block;
-  margin: auto;
-  width: 60%;
-  height: 60%;
-  font-family: Arial, sans-serif;
-  margin-top: 4%;
-}
-
+/* Setting for tooltips that appear on hover */
 .tooltip {
   position: fixed;
   z-index: 100;
@@ -67,6 +39,11 @@ button {
   box-shadow: 3px 3px 3px rgba(0, 0, 0, .3);
 }
 
+/**
+* Start frame settings
+*/
+
+/* div that contains all element and weapon images for selections */
 #Selections {
   display: block;
   margin: auto;
@@ -74,40 +51,80 @@ button {
   font-family: Arial, sans-serif;
   margin-top: 4%;
 }
+
+/* div that contains all element images for selections */
 .leftSelection {
   height:100%;
   float: left;
   width: 50%;
 }
 
+/* div that contains all weapon images for selections */
 .rightSelection {
   height:100%;
   float: left;
   width: 50%;
 }
+/* Contained in rightSelection or leftSelection */
+.selectionImage {
+  width: 50px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
 
+/**
+* Sorting/Main frame settings
+*/
+
+/* The div for the Main frame */
+#Main {
+  display: block;
+  margin: auto;
+  width: 60%;
+  height: 60%;
+  font-family: Arial, sans-serif;
+  margin-top: 4%;
+}
+
+.characterImg {
+  display: block;
+  margin: auto;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  width: 65%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Container for the left character option*/
 .left {
   height:100%;
   border:1px solid black;
   float: left;
   width: 40%;
+  background: rgb(40,40,40);
 }
+/* Container for the right character option*/
+.right {
+  height:100%;
+  /* border:1px solid black; */
+  float: left;
+  width: 40%;
+  background: rgb(40,40,40);
+}
+/* Container for the character name, contained in a .right or .left */
+.label{
+	text-align: center;
+	padding-bottom: 5%;
+}
+
+/* Container for Tie and Undo button and round information */
 .middle {
   height:100%;
   float: left;
   width: 18%;
   padding-top: 5%;
   padding-bottom: 5%;
-}
-.right {
-  height:100%;
-  border:1px solid black;
-  float: left;
-  width: 40%;
-}
-.label{
-	text-align: center;
-	padding-bottom: 5%;
 }
 
 .selected{
@@ -118,6 +135,19 @@ button {
 .unselectable{
 	background: rgb(24,24,24);
 	color: gray;
+}
+
+/**
+* Result frame settings
+*/
+
+/* Since html2canvas does not support the object-fit option, and hsr images are not square, we need another option to not distort the image */
+.characterImgTable {
+  display: block;
+  margin: auto;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  width: 65%;
 }
 
 table {
@@ -150,6 +180,11 @@ td {
   padding-right: 2%;
 }
 
+/* Different row colours */
+tr:nth-child(even) {
+	background: rgb(48,48,48);
+}
+
 .tableButton {
     position:fixed;
     right:0;
@@ -165,8 +200,4 @@ td {
     top:0;
 	margin: 0 auto;
 	display: block;
-}
-
-tr:nth-child(even) {
-	background: rgb(48,48,48);
 }
