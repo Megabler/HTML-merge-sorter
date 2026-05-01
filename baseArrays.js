@@ -320,7 +320,7 @@ function initalizeArrayWithZZZ(){
 		["59", "five", "Nangong Yu", "Stun" ,"Ether"], 
 		["60", "five", "Cissia", "AttackType" ,"Electric"], 
 		["61", "five", "Promeia", "Anomaly" ,"Ice"], 
-		["62", "five", "Starlight - Billy", "Rupture" ,"Physical"], 
+		["62", "five", "Starlight-Billy", "Rupture" ,"Physical"], 
 	];
 	for(const entry of inter){
 		entry[4] = specialTerm(entry[4]);

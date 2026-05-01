@@ -289,11 +289,12 @@
 <!-- The table frame that shows the result-->
 <div id="tableFrame" style="display:none">
 	<button id="backButton" class="tableButton" type="button" style="margin-bottom: 5%;" data-tooltip="Return to starting site to start sorting again." onclick="returnToStartFrame(event)" >Return!</button>
+	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" data-tooltip="Create a downloadable image of the result table." onclick="convertToImage(event)" >Download table!</button>
 	
 	<button id="tableToImageButton" class="tableButton" type="button" style="margin-bottom: 5%;top: 75px;" data-tooltip="Create a downloadable image of the result table." onclick="convertToImage(event)" >Download Table</button>
 	
     <div id="tableImageLink" class="tableButton" style="top: 250px">
-       <!-- Result will appear be here -->
+       <!-- Result will be added her through resultsRepresentation.js here -->
 	</div>
 	
 	<form id="imageNumberSelector">
@@ -337,7 +338,7 @@ Inspired by the <a href="https://fategrandsorter.tumblr.com/">Fate/Grand Sorter<
 		useCORS: true, // taken from https://stackoverflow.com/questions/30372417/html2canvas-not-rendering-image-externally-hosted-images
 		onrendered: function(canvas) {
 			var img = canvas.toDataURL("image/png");
-			tableImageLink.innerHTML = '<a download="test.jpeg" href="'+img+'">Download table as png!</a>';
+			tableImageLink.innerHTML = '<a download="test.jpeg" href="'+img+'">Download table as a png!</a>';
 			}
 	});
 	}        

@@ -107,7 +107,7 @@ function startSorting(){
 		}
 	}
 	if(arr.length < 1){
-		alert("No characters to sort selected. Select at least one game, element, and weapon.");
+		alert("No characters to sort selected. Select at least one game, element, and weapon or a game and mark the \"Copium?\" option.");
 		return;
 	}
 	
